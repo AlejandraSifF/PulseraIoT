@@ -1,5 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const authJWT = require('../middleware/authJWT');
+
+router.get('/private', authJWT, (req, res) => {
+  res.json({
+    ok: true,
+    msg: 'Acceso permitido',
+    uid: req.uid,
+  });
+});
 
 const { register, login, testUser } = require('../controllers/auth.controller');
 
