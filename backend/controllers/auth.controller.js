@@ -88,7 +88,6 @@ console.log('BODY:', req.body);
         msg: 'Contraseña incorrecta',
       });
     }
-
     // TOKEN
     const token = jwt.sign(
       { id: user._id },
@@ -107,8 +106,42 @@ console.log('BODY:', req.body);
   }
 };
 
+    const renew = async (req, res) => {
+      try {
+        const uid = req.uid;
+
+        const user = await User.findById(uid).select('-password');
+
+        if (!user) {
+          return res.status(404).json({
+            ok: false,
+            msg: 'Usuario no existe',
+          });
+        }
+
+        const token = jwt.sign(
+          { id: uid },
+          process.env.JWT_SECRET,
+          { expiresIn: '2h' }
+        );
+
+        res.json({
+          ok: true,
+          user,
+          token,
+        });
+
+      } catch (error) {
+        res.status(500).json({
+          ok: false,
+          error: error.message
+        });
+      }
+    };
+
 module.exports = {
   testUser,
   register,
   login,
+  renew,
 };

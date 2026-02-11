@@ -3,10 +3,12 @@ const authRoutes = require('./routes/auth.routes');
 const connectDB = require('./config/db');
 const Controllers = require('./controllers/auth.controller');
 //const authJWT = require('./middlewares/authJWT');
+const cors = require('cors');
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/api/auth', authRoutes);
 
