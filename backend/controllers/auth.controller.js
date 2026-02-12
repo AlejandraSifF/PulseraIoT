@@ -14,9 +14,18 @@ const testUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.json({ ok: true, user });
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    };
+
+    res.json({ ok: true, user: userResponse });
   } catch (error) {
-    res.status(500).json({ ok: false, error: error.message });
+    res.status(500).json({
+      ok: false,
+      message: 'Error interno del servidor'
+    });
   }
 };
 
@@ -28,7 +37,7 @@ const register = async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({
         ok: false,
-        msg: 'Todos los campos son obligatorios',
+        message: 'Todos los campos son obligatorios',
       });
     }
 
@@ -36,7 +45,7 @@ const register = async (req, res) => {
     if (exists) {
       return res.status(400).json({
         ok: false,
-        msg: 'El usuario ya existe',
+        message: 'El usuario ya existe',
       });
     }
 
@@ -49,27 +58,37 @@ const register = async (req, res) => {
       password: hashedPassword,
     });
 
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    };
+
     res.status(201).json({
       ok: true,
-      msg: 'Usuario creado correctamente',
-      user,
+      message: 'Usuario creado correctamente',
+      user: userResponse,
     });
+
   } catch (error) {
-    res.status(500).json({ ok: false, error: error.message });
+    res.status(500).json({
+      ok: false,
+      message: 'Error interno del servidor'
+    });
   }
 };
 
 // Login
 const login = async (req, res) => {
-  console.log('METHOD:', req.method);
-console.log('BODY:', req.body);
+//console.log('METHOD:', req.method);
+//console.log('BODY:', req.body);
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
         ok: false,
-        msg: 'Email y contraseña obligatorios',
+        message: 'Email y contraseña obligatorios',
       });
     }
 
@@ -77,7 +96,7 @@ console.log('BODY:', req.body);
     if (!user) {
       return res.status(400).json({
         ok: false,
-        msg: 'Usuario no existe',
+        message: 'Usuario no existe',
       });
     }
 
@@ -85,27 +104,38 @@ console.log('BODY:', req.body);
     if (!validPassword) {
       return res.status(400).json({
         ok: false,
-        msg: 'Contraseña incorrecta',
+        message: 'Contraseña incorrecta',
       });
     }
-    // TOKEN
+
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
     );
 
+    const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    };
+
     res.json({
       ok: true,
-      msg: 'Login exitoso',
+      message: 'Login exitoso',
+      user: userResponse,
       token,
-      // user,
     });
+
   } catch (error) {
-    res.status(500).json({ ok: false, error: error.message });
+    res.status(500).json({
+      ok: false,
+      message: 'Error interno del servidor'
+    });
   }
 };
 
+// Renew token
     const renew = async (req, res) => {
       try {
         const uid = req.uid;
@@ -113,31 +143,39 @@ console.log('BODY:', req.body);
         const user = await User.findById(uid).select('-password');
 
         if (!user) {
-          return res.status(404).json({
+           return res.status(404).json({
             ok: false,
-            msg: 'Usuario no existe',
-          });
-        }
-
-        const token = jwt.sign(
-          { id: uid },
-          process.env.JWT_SECRET,
-          { expiresIn: '2h' }
-        );
-
-        res.json({
-          ok: true,
-          user,
-          token,
+            message: 'Usuario no existe',
         });
+    }
 
-      } catch (error) {
-        res.status(500).json({
-          ok: false,
-          error: error.message
-        });
-      }
-    };
+      const token = jwt.sign(
+        { id: uid },
+        process.env.JWT_SECRET,
+        { expiresIn: '2h' }
+     );
+
+      const userResponse = {
+        id: user._id,
+        name: user.name,
+        email: user.email
+     };
+
+      res.json({
+        ok: true,
+         message: 'Token renovado correctamente',
+         user: userResponse,
+         token,
+     });
+
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        message: 'Error interno del servidor'
+     });
+    }
+  };
+
 
 module.exports = {
   testUser,
