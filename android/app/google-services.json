@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "703537237635",
+    "project_id": "proyecto-flutter-lyb",
+    "storage_bucket": "proyecto-flutter-lyb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:703537237635:android:c846bfd227fe7a554915b6",
+        "android_client_info": {
+          "package_name": "com.example.prueba"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFm2uPohXFLCJ06AWxcmrLCIVrWe5bP2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

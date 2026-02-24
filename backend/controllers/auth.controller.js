@@ -176,10 +176,104 @@ const login = async (req, res) => {
     }
   };
 
+  // Cambiar contraseña
+const changePassword = async (req, res) => {
+  try {
+    const uid = req.uid; // viene del token
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Faltan datos',
+      });
+    }
+
+    const user = await User.findById(uid);
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Usuario no existe',
+      });
+    }
+
+    // Verificar contraseña actual
+    const validPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!validPassword) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Contraseña actual incorrecta',
+      });
+    }
+
+    // Encriptar nueva contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({
+      ok: true,
+      message: 'Contraseña actualizada correctamente',
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: 'Error interno del servidor',
+    });
+  }
+};
+
+const changeEmail = async (req, res) => {
+  try {
+    const uid = req.uid;
+    const { newEmail } = req.body;
+
+    if (!newEmail) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Correo requerido'
+      });
+    }
+
+    const existing = await User.findOne({ email: newEmail });
+
+    if (existing) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El correo ya está en uso'
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      uid,
+      { email: newEmail },
+      { new: true }
+    );
+
+    res.json({
+      ok: true,
+      message: 'Correo actualizado',
+      user
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: 'Error interno'
+    });
+  }
+};
+
+
 
 module.exports = {
   testUser,
   register,
   login,
   renew,
+  changePassword,
+  changeEmail,
 };
