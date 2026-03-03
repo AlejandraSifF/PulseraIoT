@@ -10,7 +10,6 @@ class NotificacionesPantalla extends StatefulWidget {
   State<NotificacionesPantalla> createState() =>
       _NotificacionesScreenState();
 }
-
 class _NotificacionesScreenState extends State<NotificacionesPantalla> {
   bool recibirNotificaciones = true;
   bool alertas = true;
@@ -23,71 +22,67 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
   @override
   void initState() {
     super.initState();
-    _pedirPermisos();
     _cargarPreferencias();
-  }
-
-  Future<void> _pedirPermisos() async {
-    await _messaging.requestPermission();
   }
 
   Future<void> _cargarPreferencias() async {
     final prefs = await SharedPreferences.getInstance();
 
-    setState(() {
-      recibirNotificaciones =
-          prefs.getBool('recibirNotificaciones') ?? true;
-      alertas = prefs.getBool('alertas') ?? true;
-      sonidoAlertas = prefs.getBool('sonidoAlertas') ?? false;
-      mensajes = prefs.getBool('mensajes') ?? true;
-      sonidoMensajes = prefs.getBool('sonidoMensajes') ?? true;
-    });
+    recibirNotificaciones =
+        prefs.getBool('recibirNotificaciones') ?? true;
+    alertas = prefs.getBool('alertas') ?? true;
+    sonidoAlertas = prefs.getBool('sonidoAlertas') ?? false;
+    mensajes = prefs.getBool('mensajes') ?? true;
+    sonidoMensajes = prefs.getBool('sonidoMensajes') ?? true;
+
+    setState(() {});
+
+    await _sincronizarTopics();
   }
 
-  Future<void> _guardarPreferencia(String key, bool value) async {
+  Future<void> _sincronizarTopics() async {
+    if (!recibirNotificaciones) {
+      await _messaging.unsubscribeFromTopic("alertas_importantes");
+      await _messaging.unsubscribeFromTopic("mensajes");
+      return;
+    }
+
+    alertas
+        ? await _messaging.subscribeToTopic("alertas_importantes")
+        : await _messaging.unsubscribeFromTopic("alertas_importantes");
+
+    mensajes
+        ? await _messaging.subscribeToTopic("mensajes")
+        : await _messaging.unsubscribeFromTopic("mensajes");
+  }
+
+  Future<void> _guardar(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
   }
 
   Future<void> _toggleNotificaciones(bool value) async {
     setState(() => recibirNotificaciones = value);
-    await _guardarPreferencia('recibirNotificaciones', value);
-
-    if (!value) {
-      await _messaging.unsubscribeFromTopic("alertas_importantes");
-      await _messaging.unsubscribeFromTopic("mensajes");
-    }
-
-    _mostrarSnackBar();
+    await _guardar('recibirNotificaciones', value);
+    await _sincronizarTopics();
+    _snack();
   }
 
   Future<void> _toggleAlertas(bool value) async {
     setState(() => alertas = value);
-    await _guardarPreferencia('alertas', value);
-
-    if (value) {
-      await _messaging.subscribeToTopic("alertas_importantes");
-    } else {
-      await _messaging.unsubscribeFromTopic("alertas_importantes");
-    }
-
-    _mostrarSnackBar();
+    await _guardar('alertas', value);
+    await _sincronizarTopics();
+    _snack();
   }
 
   Future<void> _toggleMensajes(bool value) async {
     setState(() => mensajes = value);
-    await _guardarPreferencia('mensajes', value);
-
-    if (value) {
-      await _messaging.subscribeToTopic("mensajes");
-    } else {
-      await _messaging.unsubscribeFromTopic("mensajes");
-    }
-
-    _mostrarSnackBar();
+    await _guardar('mensajes', value);
+    await _sincronizarTopics();
+    _snack();
   }
 
-  void _mostrarSnackBar() {
+  void _snack() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.colorBotonPrincipal,
@@ -117,7 +112,7 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.all(20),
         children: [
 
           _switchItem(
@@ -139,11 +134,11 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
           _switchItem(
             titulo: "Sonido",
             value: sonidoAlertas,
-            onChanged: recibirNotificaciones
+            onChanged: (recibirNotificaciones && alertas)
                 ? (value) async {
                     setState(() => sonidoAlertas = value);
-                    await _guardarPreferencia('sonidoAlertas', value);
-                    _mostrarSnackBar();
+                    await _guardar('sonidoAlertas', value);
+                    _snack();
                   }
                 : null,
           ),
@@ -161,11 +156,11 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
           _switchItem(
             titulo: "Sonido",
             value: sonidoMensajes,
-            onChanged: recibirNotificaciones
+            onChanged: (recibirNotificaciones && mensajes)
                 ? (value) async {
                     setState(() => sonidoMensajes = value);
-                    await _guardarPreferencia('sonidoMensajes', value);
-                    _mostrarSnackBar();
+                    await _guardar('sonidoMensajes', value);
+                    _snack();
                   }
                 : null,
           ),
@@ -176,7 +171,7 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
 
   Widget _titulo(String texto) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 5),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Text(
         texto,
         style: const TextStyle(
@@ -198,21 +193,11 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
       decoration: BoxDecoration(
         color: AppColors.fondoBlanco,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            titulo,
-            style: const TextStyle(fontSize: 18),
-          ),
+          Text(titulo, style: const TextStyle(fontSize: 18)),
           Switch(
             value: value,
             onChanged: onChanged,
