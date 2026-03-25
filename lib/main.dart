@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'screens/configuracion.dart';
+import 'package:provider/provider.dart';
 import 'services/notificacion_service.dart';
-import 'screens/navigation/main_navigation.dart';
+import 'screens/splash_screen/splash.dart';
+import 'provider/perfil_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await NotificationService().initialize();
-  runApp(const MyApp());
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => PerfilProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,11 +26,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'NoSE',
       theme: ThemeData(
-        textTheme: GoogleFonts.karlaTextTheme(),
+        fontFamily: 'Karla',
       ),
-      home: const MainNavigation(),
+      home: const SplashScreen(),
     );
   }
 }

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class CambiarPasswordPantalla extends StatefulWidget {
   const CambiarPasswordPantalla({super.key});
@@ -106,10 +107,7 @@ class _CambiarPasswordPantallaState
         iconTheme: const IconThemeData(color: AppColors.textoClaro),
         title: const Text(
           "Cambiar contraseña",
-          style: TextStyle(
-            color: AppColors.textoClaro,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyles.appBarLight,
         ),
       ),
 
@@ -135,10 +133,9 @@ class _CambiarPasswordPantallaState
                   onPressed: () {
                     _mostrarError("Función no disponible aún");
                   },
-                  child: const Text(
+                  child: Text(
                     "¿Olvidaste tu contraseña?",
-                    style: TextStyle(
-                      fontSize: 16,
+                    style: AppTextStyles.subtitulo.copyWith(
                       color: AppColors.colorBotonPrincipal,
                     ),
                   ),
@@ -180,11 +177,7 @@ class _CambiarPasswordPantallaState
                 ),
                 child: const Text(
                   "Cambiar contraseña",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textoClaro,
-                  ),
+                  style: AppTextStyles.buttonLarge,
                 ),
               ),
             ],
@@ -201,10 +194,7 @@ class _CambiarPasswordPantallaState
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(
           texto,
-          style: const TextStyle(
-            fontSize: 20,
-            color: AppColors.colorBotonPrincipal,
-          ),
+          style: AppTextStyles.headingPrimary,
         ),
       ),
     );
@@ -218,9 +208,11 @@ class _CambiarPasswordPantallaState
     return TextFormField(
       controller: controller,
       obscureText: ocultar,
+      style: AppTextStyles.normal,
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColors.fondoCamposTexto,
+        hintStyle: AppTextStyles.secundario,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide.none,

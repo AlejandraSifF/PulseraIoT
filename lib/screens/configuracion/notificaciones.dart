@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class NotificacionesPantalla extends StatefulWidget {
   const NotificacionesPantalla({super.key});
@@ -10,6 +11,7 @@ class NotificacionesPantalla extends StatefulWidget {
   State<NotificacionesPantalla> createState() =>
       _NotificacionesScreenState();
 }
+
 class _NotificacionesScreenState extends State<NotificacionesPantalla> {
   bool recibirNotificaciones = true;
   bool alertas = true;
@@ -88,7 +90,7 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
         backgroundColor: AppColors.colorBotonPrincipal,
         content: const Text(
           "Configuración guardada",
-          style: TextStyle(color: Colors.white),
+          style: AppTextStyles.boton,
         ),
         duration: const Duration(seconds: 1),
       ),
@@ -105,10 +107,7 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Notificaciones",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyles.appBarLight,
         ),
       ),
       body: ListView(
@@ -174,10 +173,7 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
       padding: const EdgeInsets.only(bottom: 10),
       child: Text(
         texto,
-        style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
+        style: AppTextStyles.headingPrimary,
       ),
     );
   }
@@ -197,7 +193,7 @@ class _NotificacionesScreenState extends State<NotificacionesPantalla> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(titulo, style: const TextStyle(fontSize: 18)),
+          Text(titulo, style: AppTextStyles.listItem),
           Switch(
             value: value,
             onChanged: onChanged,

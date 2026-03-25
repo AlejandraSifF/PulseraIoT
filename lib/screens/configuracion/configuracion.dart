@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'editar_perfil.dart';
-import 'cambiar_contraseña.dart';
-import 'Actualizar_correo_electrónico.dart';
+import 'cambiar_password.dart';
+import 'actualizar_correo_electronico.dart';
 import 'notificaciones.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class ConfiguracionPantalla extends StatelessWidget {
   const ConfiguracionPantalla({super.key});
@@ -18,10 +19,7 @@ class ConfiguracionPantalla extends StatelessWidget {
         iconTheme: const IconThemeData(color: AppColors.textoClaro),
         title: const Text(
           'Configuración',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textoClaro,
-          ),
+          style: AppTextStyles.appBarLight,
         ),
         centerTitle: true,
         elevation: 0,
@@ -88,19 +86,18 @@ class ConfiguracionPantalla extends StatelessWidget {
               color: AppColors.colorBotonPrincipal,
             ),
           ),
+
           title: Text(
             texto,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textoOscuro,
-            ),
+            style: AppTextStyles.listItem,
           ),
+
           trailing: const Icon(
             Icons.arrow_forward_ios,
             size: 18,
             color: AppColors.colorBotonPrincipal,
           ),
+
           onTap: () {
             Navigator.push(
               context,

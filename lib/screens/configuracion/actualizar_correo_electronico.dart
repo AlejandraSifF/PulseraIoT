@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../theme/app_colors.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class CambiarCorreoPantalla extends StatefulWidget {
   const CambiarCorreoPantalla({super.key});
@@ -82,10 +83,7 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
         iconTheme: const IconThemeData(color: AppColors.textoClaro),
         title: const Text(
           "Actualizar correo",
-          style: TextStyle(
-            color: AppColors.textoClaro,
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTextStyles.appBarLight,
         ),
       ),
 
@@ -123,11 +121,7 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
                 ),
                 child: const Text(
                   "Actualizar correo",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textoClaro,
-                  ),
+                  style: AppTextStyles.buttonLarge,
                 ),
               ),
             ],
@@ -144,10 +138,7 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(
           texto,
-          style: const TextStyle(
-            fontSize: 20,
-            color: AppColors.colorBotonPrincipal,
-          ),
+          style: AppTextStyles.headingPrimary,
         ),
       ),
     );
@@ -161,9 +152,12 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
       controller: controller,
       enabled: enabled,
       keyboardType: TextInputType.emailAddress,
+      style: AppTextStyles.normal,
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColors.fondoCamposTexto,
+        hintText: enabled ? "Ingrese su nuevo correo" : null,
+        hintStyle: AppTextStyles.secundario,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(13),
           borderSide: BorderSide.none,
