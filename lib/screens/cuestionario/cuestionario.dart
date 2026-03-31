@@ -10,10 +10,15 @@ class Cuestionario extends StatefulWidget {
   final String nombre;
   final String correo;
 
+  final String telefono;
+  final String fecha;
+
   const Cuestionario({
     super.key,
     required this.nombre,
     required this.correo,
+    required this.telefono,
+    required this.fecha,
   });
 
   @override
@@ -53,35 +58,12 @@ class _CuestionarioState extends State<Cuestionario> {
           "Cuestionario de Salud",
           style: AppTextStyles.appBar,
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(4),
-          child: LinearProgressIndicator(
-            value: (pasoActual + 1) / totalPasos,
-            backgroundColor: AppColors.inputLogin,
-            valueColor: AlwaysStoppedAnimation<Color>(
-                AppColors.colorBotonPrincipal),
-          ),
-        ),
       ),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.inputLogin,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                "${pasoActual + 1}/2",
-                style: AppTextStyles.subtitulo.copyWith(
-                  color: AppColors.colorBotonPrincipal,
-                ),
-              ),
-            ),
 
             const SizedBox(height: 20),
 
@@ -95,8 +77,6 @@ class _CuestionarioState extends State<Cuestionario> {
                   )
                 : Column(
                     children: [
-                      _buildActividadYRiesgos(),
-                      const SizedBox(height: 30),
                       _buildUsoSistema(),
                     ],
                   ),
@@ -127,7 +107,6 @@ class _CuestionarioState extends State<Cuestionario> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.colorBotonPrincipal,
                       foregroundColor: AppColors.textoClaro,
-                      textStyle: AppTextStyles.boton,
                     ),
                     child: Text(
                       pasoActual == totalPasos - 1
@@ -144,6 +123,34 @@ class _CuestionarioState extends State<Cuestionario> {
     );
   }
 
+  // ================= UI =================
+
+  Widget _titulo(String texto) {
+    return Text(
+      texto,
+      style: AppTextStyles.headingPrimary,
+    );
+  }
+
+  Widget _subtitulo(String texto) {
+    return Text(
+      texto,
+      style: AppTextStyles.subtitulo.copyWith(
+        color: AppColors.colorBotonPrincipal,
+      ),
+    );
+  }
+
+  Widget _radio(String texto, String? grupo, Function(String?) onChanged) {
+    return RadioListTile(
+      activeColor: AppColors.colorBotonPrincipal,
+      title: Text(texto, style: AppTextStyles.option),
+      value: texto,
+      groupValue: grupo,
+      onChanged: (v) => setState(() => onChanged(v)),
+    );
+  }
+
   // ================= PASO 1 =================
 
   Widget _buildDatosGenerales() {
@@ -151,7 +158,7 @@ class _CuestionarioState extends State<Cuestionario> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        _titulo("Datos generales"),
+        _titulo("Datos generales del adulto mayor"),
 
         const SizedBox(height: 15),
 
@@ -230,14 +237,7 @@ class _CuestionarioState extends State<Cuestionario> {
     );
   }
 
-  Widget _buildActividadYRiesgos() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _titulo("Actividad física"),
-      ],
-    );
-  }
+  // ================= PASO 2 =================
 
   Widget _buildUsoSistema() {
     return Column(
@@ -280,34 +280,6 @@ class _CuestionarioState extends State<Cuestionario> {
     );
   }
 
-  // ================= UI REUTILIZABLE =================
-
-  Widget _titulo(String texto) {
-    return Text(
-      texto,
-      style: AppTextStyles.headingPrimary,
-    );
-  }
-
-  Widget _subtitulo(String texto) {
-    return Text(
-      texto,
-      style: AppTextStyles.subtitulo.copyWith(
-        color: AppColors.colorBotonPrincipal,
-      ),
-    );
-  }
-
-  Widget _radio(String texto, String? grupo, Function(String?) onChanged) {
-    return RadioListTile(
-      activeColor: AppColors.colorBotonPrincipal,
-      title: Text(texto, style: AppTextStyles.option),
-      value: texto,
-      groupValue: grupo,
-      onChanged: (v) => setState(() => onChanged(v)),
-    );
-  }
-
   // ================= LÓGICA =================
 
   void _siguientePaso() {
@@ -320,28 +292,34 @@ class _CuestionarioState extends State<Cuestionario> {
 
   void _finalizarCuestionario() async {
 
-    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+    final perfilProvider =
+        Provider.of<PerfilProvider>(context, listen: false);
 
+    /// 🔥 CALCULAR PERFIL
+    String tipoHome;
+
+    if (tieneHipertension && tieneDiabetes) {
+      tipoHome = "Hipertensión Y Diabetes";
+    } else if (tieneHipertension) {
+      tipoHome = "Hipertensión";
+    } else if (tieneDiabetes) {
+      tipoHome = "Diabetes";
+    } else {
+      tipoHome = "Sano";
+    }
+
+    /// 🔥 GUARDAR DATOS
     await perfilProvider.guardarDatos(
       nombre: widget.nombre,
       edad: int.tryParse(edadCtrl.text) ?? 0,
       sexo: sexoSeleccionado ?? "",
       nombreContacto: nombreContactoCtrl.text,
       telefonoContacto: telefonoContactoCtrl.text,
+      telefonoUsuario: widget.telefono,
+      fechaNacimiento: widget.fecha,
     );
 
-    String tipoHome;
-
-    if (tieneHipertension && tieneDiabetes) {
-      tipoHome = "combinado";
-    } else if (tieneHipertension) {
-      tipoHome = "hipertension";
-    } else if (tieneDiabetes) {
-      tipoHome = "diabetes";
-    } else {
-      tipoHome = "sano";
-    }
-
+    /// 🔥 IR AL HOME CORRECTO
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(

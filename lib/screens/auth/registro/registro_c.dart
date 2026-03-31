@@ -7,7 +7,17 @@ class RegistroC extends StatefulWidget {
   final String nombre;
   final String correo;
 
-  const RegistroC({super.key, required this.nombre, required this.correo});
+  // 🔥 NUEVOS
+  final String telefono;
+  final String fecha;
+
+  const RegistroC({
+    super.key,
+    required this.nombre,
+    required this.correo,
+    required this.telefono, // 🔥
+    required this.fecha,    // 🔥
+  });
 
   @override
   State<RegistroC> createState() => _RegistroCState();
@@ -33,14 +43,6 @@ class _RegistroCState extends State<RegistroC> {
       filled: true,
       fillColor: AppColors.inputRegistro,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
@@ -167,12 +169,16 @@ class _RegistroCState extends State<RegistroC> {
 
                           Future.delayed(
                               const Duration(milliseconds: 500), () {
+
+                            /// 🔥 AQUÍ PASAMOS TODO AL CUESTIONARIO
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => Cuestionario(
                                   nombre: widget.nombre,
                                   correo: widget.correo,
+                                  telefono: widget.telefono, // 🔥
+                                  fecha: widget.fecha,       // 🔥
                                 ),
                               ),
                             );

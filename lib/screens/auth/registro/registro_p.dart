@@ -59,14 +59,6 @@ class _RegistroPState extends State<RegistroP> {
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
     );
   }
 
@@ -109,11 +101,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 10),
 
-            /// NOMBRE
-            const Text(
-              "Nombre Completo",
-              style: AppTextStyles.subtitulo,
-            ),
+            const Text("Nombre Completo", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             TextField(
               controller: nombreCtrl,
@@ -123,11 +111,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 20),
 
-            /// CORREO
-            const Text(
-              "Correo",
-              style: AppTextStyles.subtitulo,
-            ),
+            const Text("Correo", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             TextField(
               controller: correoCtrl,
@@ -138,11 +122,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 20),
 
-            /// TELÉFONO
-            const Text(
-              "Número de Teléfono",
-              style: AppTextStyles.subtitulo,
-            ),
+            const Text("Número de Teléfono", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             IntlPhoneField(
               controller: telefonoController,
@@ -157,11 +137,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 20),
 
-            /// FECHA
-            const Text(
-              "Fecha de Nacimiento",
-              style: AppTextStyles.subtitulo,
-            ),
+            const Text("Fecha de Nacimiento", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             TextField(
               controller: fechaCtrl,
@@ -194,7 +170,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 25),
 
-            /// BOTÓN
+            /// 🔥 BOTÓN CORREGIDO
             Center(
               child: SizedBox(
                 width: 220,
@@ -208,6 +184,8 @@ class _RegistroPState extends State<RegistroP> {
                               builder: (_) => RegistroC(
                                 nombre: nombreCtrl.text,
                                 correo: correoCtrl.text,
+                                telefono: telefonoCompleto, // 🔥
+                                fecha: fechaCtrl.text,       // 🔥
                               ),
                             ),
                           );
@@ -238,7 +216,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 20),
 
-            /// GOOGLE
+            /// 🔥 GOOGLE TAMBIÉN PASA DATOS VACÍOS (para no romper flujo)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -263,6 +241,8 @@ class _RegistroPState extends State<RegistroP> {
                               builder: (_) => Cuestionario(
                                 nombre: userCredential.user?.displayName ?? '',
                                 correo: userCredential.user?.email ?? '',
+                                telefono: "", // 🔥 importante
+                                fecha: "",    // 🔥 importante
                               ),
                             ),
                           );

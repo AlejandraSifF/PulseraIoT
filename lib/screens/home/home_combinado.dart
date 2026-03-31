@@ -16,30 +16,32 @@ class HomeCombinado extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.fondoPantallaPrincipal,
-      body: _homeContent(imagenPerfil),
+      body: _homeContent(context, perfilProvider, imagenPerfil),
     );
   }
 
-  Widget _homeContent(File? imagenPerfil) {
+  Widget _homeContent(BuildContext context, PerfilProvider perfilProvider, File? imagenPerfil) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
 
-            /// HEADER
+            /// 🔥 HEADER DINÁMICO
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       "Hola, Bienvenido",
                       style: AppTextStyles.secundario,
                     ),
                     Text(
-                      "John Doe",
+                      perfilProvider.nombre.isNotEmpty
+                          ? perfilProvider.nombre
+                          : "Usuario",
                       style: AppTextStyles.subtitulo,
                     ),
                   ],
@@ -56,7 +58,7 @@ class HomeCombinado extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// PERFIL CARD
+            /// 🔥 PERFIL CARD DINÁMICO
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -76,17 +78,19 @@ class HomeCombinado extends StatelessWidget {
 
                   const SizedBox(width: 15),
 
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Javier\nHernandez",
+                          perfilProvider.nombre.isNotEmpty
+                              ? perfilProvider.nombre
+                              : "Nombre completo",
                           style: AppTextStyles.subtitulo,
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
-                          "72 años",
+                          "${perfilProvider.edad} años",
                           style: AppTextStyles.secundario,
                         ),
                       ],
@@ -111,7 +115,7 @@ class HomeCombinado extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            /// CARDS
+            /// CARDS (igual)
             Expanded(
               child: SingleChildScrollView(
                 child: Column(

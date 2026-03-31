@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../provider/perfil_provider.dart';
 import '../../theme/app_colors.dart';
@@ -16,6 +18,12 @@ class Perfil extends StatelessWidget {
 
     final perfilProvider = Provider.of<PerfilProvider>(context);
     File? imagenPerfil = perfilProvider.imagenPerfil;
+
+    /// 🔥 FECHA AUTOMÁTICA
+    final fechaActual = DateFormat('dd MMM yyyy', 'es').format(DateTime.now());
+
+    /// 🔥 DATOS DINÁMICOS SEGÚN PERFIL
+    final datosSalud = obtenerDatosSalud(tipoPerfil);
 
     return Scaffold(
       backgroundColor: AppColors.fondoPantallaPrincipal,
@@ -60,9 +68,10 @@ class Perfil extends StatelessWidget {
 
                             const SizedBox(height: 20),
 
-                            /// 🔥 NOMBRE DINÁMICO
                             Text(
-                              perfilProvider.nombre,
+                              perfilProvider.nombre.isNotEmpty
+                                  ? perfilProvider.nombre
+                                  : "Nombre completo",
                               style: AppTextStyles.heading.copyWith(
                                 color: AppColors.textoClaro,
                               ),
@@ -74,7 +83,6 @@ class Perfil extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
 
-                                /// 🔥 EDAD
                                 Text(
                                   "Edad\n${perfilProvider.edad} años",
                                   style: AppTextStyles.secundario.copyWith(
@@ -82,7 +90,6 @@ class Perfil extends StatelessWidget {
                                   ),
                                 ),
 
-                                /// 🔥 SEXO
                                 Text(
                                   "Género\n${perfilProvider.sexo}",
                                   style: AppTextStyles.secundario.copyWith(
@@ -124,13 +131,12 @@ class Perfil extends StatelessWidget {
                     ),
                   ),
 
-                  /// TARJETA
+                  /// 🔥 TARJETA PRINCIPAL
                   Positioned(
                     top: 180,
                     left: (MediaQuery.of(context).size.width - 323) / 2,
                     child: Container(
                       width: 323,
-                      height: 280,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: AppColors.cardColor,
@@ -146,19 +152,47 @@ class Perfil extends StatelessWidget {
 
                           const SizedBox(height: 20),
 
+                          /// 🔥 FILA 1 DINÁMICA
                           Row(
                             children: [
                               Expanded(
                                 child: _beigeCard(
                                   "Condiciones registradas",
-                                  "Auto detectado",
+                                  datosSalud["condicion"]!,
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: _beigeCard(
                                   "Actividad recomendada",
-                                  "Según perfil",
+                                  datosSalud["actividad"]!,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          /// 🔥 FILA 2
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _beigeCard(
+                                  "Estado de monitoreo",
+                                  "Activo",
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Text(
+                                    "Fecha $fechaActual",
+                                    style: AppTextStyles.secundario.copyWith(
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -172,7 +206,7 @@ class Perfil extends StatelessWidget {
 
               const SizedBox(height: 220),
 
-              /// 🔥 CONTACTO DINÁMICO
+              /// 🔥 CONTACTO
               Container(
                 width: 278,
                 height: 234,
@@ -192,21 +226,58 @@ class Perfil extends StatelessWidget {
 
                     const SizedBox(height: 15),
 
-                    Text(perfilProvider.nombreContacto),
-                    Text(perfilProvider.telefonoContacto),
+                    Text(
+                      perfilProvider.nombreContacto.isNotEmpty
+                          ? perfilProvider.nombreContacto
+                          : "Sin nombre",
+                    ),
+
+                    Text(
+                      perfilProvider.telefonoContacto.isNotEmpty
+                          ? perfilProvider.telefonoContacto
+                          : "Sin teléfono",
+                    ),
 
                     const Spacer(),
 
-                    Container(
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: AppColors.colorBotonPrincipal,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "Llamar contacto",
-                          style: AppTextStyles.boton,
+                    /// 🔥 BOTÓN LLAMAR
+                    GestureDetector(
+                      onTap: () async {
+
+                        final numero = perfilProvider.telefonoContacto;
+
+                        if (numero.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("No hay número disponible"),
+                            ),
+                          );
+                          return;
+                        }
+
+                        final Uri url = Uri(scheme: 'tel', path: numero);
+
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("No se pudo abrir el marcador"),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: AppColors.colorBotonPrincipal,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Llamar contacto",
+                            style: AppTextStyles.boton,
+                          ),
                         ),
                       ),
                     ),
@@ -222,6 +293,38 @@ class Perfil extends StatelessWidget {
     );
   }
 
+  /// 🔥 FUNCIÓN DINÁMICA
+  Map<String, String> obtenerDatosSalud(String tipoPerfil) {
+    switch (tipoPerfil) {
+
+      case "Hipertensión":
+        return {
+          "condicion": "Hipertensión\ncontrolada",
+          "actividad": "Reducir sal\nCaminar 30 min"
+        };
+
+      case "Diabetes":
+        return {
+          "condicion": "Diabetes\ncontrolada",
+          "actividad": "Dieta baja azúcar\nEjercicio diario"
+        };
+
+      case "Hipertensión Y Diabetes":
+        return {
+          "condicion": "Hipertensión +\nDiabetes",
+          "actividad": "Dieta estricta\nMonitoreo constante"
+        };
+
+      case "Sano":
+      default:
+        return {
+          "condicion": "Sin condiciones",
+          "actividad": "Ejercicio regular\nVida saludable"
+        };
+    }
+  }
+
+  /// 🔥 CARD
   static Widget _beigeCard(String title, String content) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -231,9 +334,17 @@ class Perfil extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title),
-          Text(content),
+          Text(
+            title,
+            style: AppTextStyles.secundario.copyWith(fontSize: 12),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            content,
+            style: AppTextStyles.headingPrimary.copyWith(fontSize: 13),
+          ),
         ],
       ),
     );

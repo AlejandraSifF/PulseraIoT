@@ -21,13 +21,16 @@ class _EditarPerfilSubpantallaState
 
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController nombreController = TextEditingController();
+  final TextEditingController nombreUsuarioController = TextEditingController();
+  final TextEditingController telefonoUsuarioController = TextEditingController();
   final TextEditingController fechaController = TextEditingController();
-  final TextEditingController telefonoController = TextEditingController();
+  final TextEditingController nombrereContactoEmergenciaController = TextEditingController();
+  final TextEditingController telefonoContactoEmergenciaController = TextEditingController();
 
-  String telefonoCompleto = "";
+  /// 🔥 CÓDIGOS SEPARADOS
+  String codigoUsuario = "+52";
+  String codigoEmergencia = "+52";
   String codigoPais = "MX";
-  String codigoNumerico = "+52";
 
   File? _imagenSeleccionada;
   final ImagePicker _picker = ImagePicker();
@@ -36,7 +39,6 @@ class _EditarPerfilSubpantallaState
   void initState() {
     super.initState();
 
-    /// 🔥 ESPERA A QUE EL PROVIDER CARGUE DATOS
     Future.microtask(() async {
       final perfil =
           Provider.of<PerfilProvider>(context, listen: false);
@@ -46,11 +48,17 @@ class _EditarPerfilSubpantallaState
       if (!mounted) return;
 
       setState(() {
-        nombreController.text = perfil.nombre;
+        /// 👤 USUARIO
+        nombreUsuarioController.text = perfil.nombre;
+        telefonoUsuarioController.text =
+            perfil.telefonoUsuario.replaceAll("+52", "");
+
+        /// 🎂 FECHA
         fechaController.text = perfil.fechaNacimiento;
 
-        telefonoCompleto = perfil.telefonoContacto;
-        telefonoController.text =
+        /// 🚨 CONTACTO EMERGENCIA
+        nombrereContactoEmergenciaController.text = perfil.nombreContacto;
+        telefonoContactoEmergenciaController.text =
             perfil.telefonoContacto.replaceAll("+52", "");
       });
     });
@@ -58,15 +66,48 @@ class _EditarPerfilSubpantallaState
 
   // ================= IMAGEN =================
 
-  Future<void> _seleccionarImagen() async {
-    final XFile? imagen =
-        await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> _mostrarOpciones() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text("Tomar foto"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? imagen =
+                      await _picker.pickImage(source: ImageSource.camera);
 
-    if (imagen != null) {
-      setState(() {
-        _imagenSeleccionada = File(imagen.path);
-      });
-    }
+                  if (imagen != null) {
+                    setState(() {
+                      _imagenSeleccionada = File(imagen.path);
+                    });
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text("Elegir de galería"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? imagen =
+                      await _picker.pickImage(source: ImageSource.gallery);
+
+                  if (imagen != null) {
+                    setState(() {
+                      _imagenSeleccionada = File(imagen.path);
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // ================= FECHA =================
@@ -100,26 +141,30 @@ class _EditarPerfilSubpantallaState
       return;
     }
 
-    if (telefonoController.text.isEmpty) {
+    if (telefonoUsuarioController.text.isEmpty) {
       _mostrarError("Ingresa un teléfono");
       return;
     }
 
-    telefonoCompleto = "$codigoNumerico${telefonoController.text}";
+    final telefonoUsuarioCompleto =
+        "$codigoUsuario${telefonoUsuarioController.text}";
+
+    final telefonoEmergenciaCompleto =
+        "$codigoEmergencia${telefonoContactoEmergenciaController.text}";
 
     final perfilProvider =
         Provider.of<PerfilProvider>(context, listen: false);
 
     await perfilProvider.guardarDatos(
-      nombre: nombreController.text,
+      nombre: nombreUsuarioController.text,
       edad: perfilProvider.edad,
       sexo: perfilProvider.sexo,
-      nombreContacto: perfilProvider.nombreContacto,
-      telefonoContacto: telefonoCompleto,
+      nombreContacto: nombrereContactoEmergenciaController.text,
+      telefonoContacto: telefonoEmergenciaCompleto,
+      telefonoUsuario: telefonoUsuarioCompleto,
       fechaNacimiento: fechaController.text,
     );
 
-    /// GUARDAR IMAGEN
     if (_imagenSeleccionada != null) {
       await perfilProvider.guardarImagen(_imagenSeleccionada!.path);
     }
@@ -172,45 +217,83 @@ class _EditarPerfilSubpantallaState
 
               const SizedBox(height: 30),
 
-              /// FOTO
               GestureDetector(
-                onTap: _seleccionarImagen,
-                child: CircleAvatar(
-                  radius: 55,
-                  backgroundImage: _imagenSeleccionada != null
-                      ? FileImage(_imagenSeleccionada!)
-                      : (perfil.imagenPerfil != null
-                          ? FileImage(perfil.imagenPerfil!)
-                          : const AssetImage("assets/images/perfil.png")
-                              as ImageProvider),
+                onTap: _mostrarOpciones,
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+
+                    CircleAvatar(
+                      radius: 55,
+                      backgroundImage: _imagenSeleccionada != null
+                          ? FileImage(_imagenSeleccionada!)
+                          : (perfil.imagenPerfil != null
+                              ? FileImage(perfil.imagenPerfil!)
+                              : const AssetImage("assets/images/perfil.png")
+                                  as ImageProvider),
+                    ),
+
+                    Container(
+                      decoration: const BoxDecoration(
+                        color: AppColors.colorPrincipal,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.edit,
+                        color: AppColors.textoClaro,
+                        size: 20,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
               const SizedBox(height: 40),
 
-              /// NOMBRE
+              /// 👤 USUARIO
               _titulo("Nombre completo"),
               TextFormField(
-                controller: nombreController,
+                controller: nombreUsuarioController,
                 decoration: _inputDecoration("Escribe tu nombre"),
               ),
 
               const SizedBox(height: 25),
 
-              /// TELÉFONO
               _titulo("Número de teléfono"),
               IntlPhoneField(
-                controller: telefonoController,
+                controller: telefonoUsuarioController,
                 initialCountryCode: codigoPais,
                 decoration: _inputDecoration("Ej. 1234567890"),
                 onChanged: (phone) {
-                  codigoNumerico = phone.countryCode;
+                  codigoUsuario = phone.countryCode;
                 },
               ),
 
               const SizedBox(height: 25),
 
-              /// FECHA
+              /// 🚨 CONTACTO EMERGENCIA
+              _titulo("Nombre contacto de emergencia"),
+              TextFormField(
+                controller: nombrereContactoEmergenciaController,
+                decoration: _inputDecoration("Nombre del contacto"),
+              ),
+
+              const SizedBox(height: 25),
+
+              _titulo("Teléfono contacto de emergencia"),
+              IntlPhoneField(
+                controller: telefonoContactoEmergenciaController,
+                initialCountryCode: codigoPais,
+                decoration: _inputDecoration("Ej. 1234567890"),
+                onChanged: (phone) {
+                  codigoEmergencia = phone.countryCode;
+                },
+              ),
+
+              const SizedBox(height: 25),
+
+              /// 🎂 FECHA
               _titulo("Fecha de nacimiento"),
               GestureDetector(
                 onTap: _seleccionarFecha,
@@ -224,7 +307,6 @@ class _EditarPerfilSubpantallaState
 
               const SizedBox(height: 50),
 
-              /// BOTÓN
               ElevatedButton(
                 onPressed: _guardarDatos,
                 style: ElevatedButton.styleFrom(
