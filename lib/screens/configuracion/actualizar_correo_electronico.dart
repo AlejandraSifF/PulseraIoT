@@ -19,6 +19,20 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
   final TextEditingController correoActualController = TextEditingController();
   final TextEditingController nuevoCorreoController = TextEditingController();
 
+  // 🔴 CARGAR CORREO GUARDADO
+  @override
+  void initState() {
+    super.initState();
+    _cargarCorreo();
+  }
+
+  Future<void> _cargarCorreo() async {
+    final prefs = await SharedPreferences.getInstance();
+    String correo = prefs.getString("correo") ?? "";
+
+    correoActualController.text = correo;
+  }
+
   Future<void> _cambiarCorreo() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -45,6 +59,13 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
       final data = jsonDecode(response.body);
 
       if (data['ok']) {
+
+        // 🔴 GUARDAR NUEVO CORREO LOCALMENTE
+        await prefs.setString(
+          "correo",
+          nuevoCorreoController.text.trim(),
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text("Correo actualizado correctamente"),
@@ -70,6 +91,13 @@ class _CambiarCorreoPantallaState extends State<CambiarCorreoPantalla> {
         backgroundColor: AppColors.error,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    correoActualController.dispose();
+    nuevoCorreoController.dispose();
+    super.dispose();
   }
 
   @override

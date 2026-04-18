@@ -105,7 +105,7 @@ class HomeCombinado extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      "Perfil Combinado",
+                      "Perfil Hipertensión y Diabetes",
                       style: AppTextStyles.pequeno,
                     ),
                   )

@@ -16,6 +16,7 @@ class PerfilProvider extends ChangeNotifier {
 
   String fechaNacimiento = "";
   String tipoPerfil = "";
+  String correo = "";
 
   PerfilProvider(){
     cargarDatos();
@@ -57,8 +58,11 @@ class PerfilProvider extends ChangeNotifier {
 
     fechaNacimiento = prefs.getString("fecha") ?? "";
     tipoPerfil = prefs.getString("tipoPerfil") ?? "";
-
+    
+    correo = prefs.getString("correo") ?? "";
+    
     notifyListeners();
+    
   }
 
   Future guardarDatos({
@@ -69,11 +73,11 @@ class PerfilProvider extends ChangeNotifier {
     required String telefonoContacto,
     String telefonoUsuario = "",
     String fechaNacimiento = "",
+    String correo = "",
   }) async {
 
     final prefs = await SharedPreferences.getInstance();
 
-    /// 🔥 Evitar sobreescribir con datos vacíos
     final telefonoUsuarioFinal =
         telefonoUsuario.isNotEmpty ? telefonoUsuario : this.telefonoUsuario;
 
@@ -86,7 +90,9 @@ class PerfilProvider extends ChangeNotifier {
     final fechaFinal =
         fechaNacimiento.isNotEmpty ? fechaNacimiento : this.fechaNacimiento;
 
-    /// 🔥 Guardar en almacenamiento
+    final correoFinal =
+        correo.isNotEmpty ? correo : this.correo;
+
     await prefs.setString("nombre", nombre);
     await prefs.setInt("edad", edad);
     await prefs.setString("sexo", sexo);
@@ -98,8 +104,9 @@ class PerfilProvider extends ChangeNotifier {
     await prefs.setString("fecha", fechaFinal);
 
     await prefs.setString("tipoPerfil", tipoPerfil);
+    
+    await prefs.setString("correo", correoFinal);
 
-    /// 🔥 Actualizar variables en memoria
     this.nombre = nombre;
     this.edad = edad;
     this.sexo = sexo;
@@ -110,6 +117,31 @@ class PerfilProvider extends ChangeNotifier {
 
     this.fechaNacimiento = fechaFinal;
     this.tipoPerfil = tipoPerfil;
+
+    this.correo = correoFinal;
+    notifyListeners();
+  }
+
+  // ================= 🔴 CERRAR SESIÓN =================
+
+  Future cerrarSesion() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.clear(); // 🔥 BORRA TODO
+
+    // 🔄 Resetear variables
+    nombre = "";
+    edad = 0;
+    sexo = "";
+
+    telefonoUsuario = "";
+    nombreContacto = "";
+    telefonoContacto = "";
+
+    fechaNacimiento = "";
+    tipoPerfil = "";
+
+    imagenPerfil = null;
 
     notifyListeners();
   }

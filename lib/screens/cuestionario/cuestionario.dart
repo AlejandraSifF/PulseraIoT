@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../navigation/main_navigation.dart';
 import '../../provider/perfil_provider.dart';
@@ -9,7 +10,6 @@ import '../../theme/app_text_styles.dart';
 class Cuestionario extends StatefulWidget {
   final String nombre;
   final String correo;
-
   final String telefono;
   final String fecha;
 
@@ -37,6 +37,15 @@ class _CuestionarioState extends State<Cuestionario> {
   bool tieneHipertension = false;
   bool tieneDiabetes = false;
   bool tieneNinguna = false;
+
+  String? caidasRecientes;
+  String? movilidad;
+  String? medicacion;
+
+  String codigoEmergencia = "+52";
+  String codigoPais = "MX";
+
+  String? errorTelefono;
 
   int pasoActual = 0;
   final int totalPasos = 2;
@@ -73,6 +82,8 @@ class _CuestionarioState extends State<Cuestionario> {
                       _buildDatosGenerales(),
                       const SizedBox(height: 30),
                       _buildSalud(),
+                      const SizedBox(height: 20),
+                      _buildExtraSalud(),
                     ],
                   )
                 : Column(
@@ -126,10 +137,7 @@ class _CuestionarioState extends State<Cuestionario> {
   // ================= UI =================
 
   Widget _titulo(String texto) {
-    return Text(
-      texto,
-      style: AppTextStyles.headingPrimary,
-    );
+    return Text(texto, style: AppTextStyles.headingPrimary);
   }
 
   Widget _subtitulo(String texto) {
@@ -178,7 +186,6 @@ class _CuestionarioState extends State<Cuestionario> {
         ),
 
         _subtitulo("Sexo:"),
-
         _radio("Femenino", sexoSeleccionado, (v) => sexoSeleccionado = v),
         _radio("Masculino", sexoSeleccionado, (v) => sexoSeleccionado = v),
         _radio("Prefiero no decir", sexoSeleccionado, (v) => sexoSeleccionado = v),
@@ -186,7 +193,6 @@ class _CuestionarioState extends State<Cuestionario> {
         const SizedBox(height: 10),
 
         _subtitulo("¿Vive solo(a)?"),
-
         _radio("Sí", viveSolo, (v) => viveSolo = v),
         _radio("No", viveSolo, (v) => viveSolo = v),
       ],
@@ -225,19 +231,47 @@ class _CuestionarioState extends State<Cuestionario> {
           activeColor: AppColors.colorBotonPrincipal,
           title: const Text("Ninguna", style: AppTextStyles.option),
           value: tieneNinguna,
-          onChanged: (v) => setState(() {
-            tieneNinguna = v!;
-            if (v) {
-              tieneHipertension = false;
-              tieneDiabetes = false;
-            }
-          }),
+          onChanged: (tieneHipertension || tieneDiabetes)
+              ? null
+              : (v) => setState(() {
+                    tieneNinguna = v!;
+                    if (v) {
+                      tieneHipertension = false;
+                      tieneDiabetes = false;
+                    }
+                  }),
         ),
       ],
     );
   }
 
-  // ================= PASO 2 =================
+  Widget _buildExtraSalud() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        _titulo("Historial y condición física"),
+
+        _subtitulo("¿Ha sufrido caídas recientemente?"),
+        _radio("Sí", caidasRecientes, (v) => caidasRecientes = v),
+        _radio("No", caidasRecientes, (v) => caidasRecientes = v),
+
+        const SizedBox(height: 10),
+
+        _subtitulo("Movilidad"),
+        _radio("Camina sin ayuda", movilidad, (v) => movilidad = v),
+        _radio("Usa bastón", movilidad, (v) => movilidad = v),
+        _radio("Usa andadera", movilidad, (v) => movilidad = v),
+        _radio("Silla de ruedas", movilidad, (v) => movilidad = v),
+
+        const SizedBox(height: 10),
+
+        _subtitulo("¿Toma medicamentos diariamente?"),
+        _radio("Sí", medicacion, (v) => medicacion = v),
+        _radio("No", medicacion, (v) => medicacion = v),
+      ],
+    );
+  }
 
   Widget _buildUsoSistema() {
     return Column(
@@ -262,9 +296,9 @@ class _CuestionarioState extends State<Cuestionario> {
 
         const SizedBox(height: 10),
 
-        TextField(
+        IntlPhoneField(
           controller: telefonoContactoCtrl,
-          keyboardType: TextInputType.number,
+          initialCountryCode: codigoPais,
           decoration: InputDecoration(
             hintText: "Teléfono del contacto",
             hintStyle: AppTextStyles.secundario,
@@ -274,20 +308,139 @@ class _CuestionarioState extends State<Cuestionario> {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide.none,
             ),
+            errorText: errorTelefono,
           ),
+          onChanged: (phone) {
+            codigoEmergencia = phone.countryCode;
+
+            if (phone.number.length < 8) {
+              setState(() {
+                errorTelefono = "Número inválido";
+              });
+            } else {
+              setState(() {
+                errorTelefono = null;
+              });
+            }
+          },
         ),
       ],
+    );
+  }
+
+  // ================= VALIDACIONES =================
+
+  bool _validarPaso1() {
+    int? edad = int.tryParse(edadCtrl.text);
+
+    if (edad == null || edad < 65) {
+      _mensaje("Edad inválida (65+)");
+      return false;
+    }
+
+    if (sexoSeleccionado == null) {
+      _mensaje("Selecciona el sexo");
+      return false;
+    }
+
+    if (viveSolo == null) {
+      _mensaje("Indica si vive solo(a)");
+      return false;
+    }
+
+    if (!tieneHipertension && !tieneDiabetes && !tieneNinguna) {
+      _mensaje("Selecciona condición de salud");
+      return false;
+    }
+
+    if (caidasRecientes == null) {
+      _mensaje("Responde sobre caídas");
+      return false;
+    }
+
+    if (movilidad == null) {
+      _mensaje("Selecciona movilidad");
+      return false;
+    }
+
+    if (medicacion == null) {
+      _mensaje("Indica medicamentos");
+      return false;
+    }
+
+    return true;
+  }
+
+  bool _validarPaso2() {
+    if (nombreContactoCtrl.text.isEmpty) {
+      _mensaje("Ingresa el nombre del contacto");
+      return false;
+    }
+
+    if (telefonoContactoCtrl.text.isEmpty || errorTelefono != null) {
+      _mensaje("Teléfono inválido");
+      return false;
+    }
+
+    return true;
+  }
+
+  // 🔥 SnackBar con color de la app
+  void _mensaje(String texto) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          texto,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.colorBotonPrincipal,
+      ),
     );
   }
 
   // ================= LÓGICA =================
 
   void _siguientePaso() {
-    if (pasoActual == totalPasos - 1) {
-      _finalizarCuestionario();
-    } else {
+    if (pasoActual == 0) {
+      if (!_validarPaso1()) return;
       setState(() => pasoActual++);
+      return;
     }
+
+    if (pasoActual == 1) {
+      if (!_validarPaso2()) return;
+      _confirmarFinal(); // 👈 aquí el popup
+    }
+  }
+
+  // 🔥 Popup de confirmación
+  void _confirmarFinal() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Confirmar"),
+        content: const Text("¿Deseas guardar la información?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "Cancelar",
+              style: TextStyle(color: AppColors.colorBotonPrincipal),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _finalizarCuestionario();
+            },
+            child: Text(
+              "Guardar",
+              style: TextStyle(color: AppColors.colorBotonPrincipal),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _finalizarCuestionario() async {
@@ -295,31 +448,31 @@ class _CuestionarioState extends State<Cuestionario> {
     final perfilProvider =
         Provider.of<PerfilProvider>(context, listen: false);
 
-    /// 🔥 CALCULAR PERFIL
     String tipoHome;
 
     if (tieneHipertension && tieneDiabetes) {
-      tipoHome = "Hipertensión Y Diabetes";
+      tipoHome = "Hipertension y Diabetes";
     } else if (tieneHipertension) {
-      tipoHome = "Hipertensión";
+      tipoHome = "Hipertension";
     } else if (tieneDiabetes) {
       tipoHome = "Diabetes";
     } else {
       tipoHome = "Sano";
     }
 
-    /// 🔥 GUARDAR DATOS
+    final telefonoCompleto =
+        "$codigoEmergencia${telefonoContactoCtrl.text}";
+
     await perfilProvider.guardarDatos(
       nombre: widget.nombre,
-      edad: int.tryParse(edadCtrl.text) ?? 0,
-      sexo: sexoSeleccionado ?? "",
+      edad: int.parse(edadCtrl.text),
+      sexo: sexoSeleccionado!,
       nombreContacto: nombreContactoCtrl.text,
-      telefonoContacto: telefonoContactoCtrl.text,
+      telefonoContacto: telefonoCompleto,
       telefonoUsuario: widget.telefono,
       fechaNacimiento: widget.fecha,
     );
 
-    /// 🔥 IR AL HOME CORRECTO
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(

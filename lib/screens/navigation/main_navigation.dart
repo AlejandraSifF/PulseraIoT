@@ -9,7 +9,6 @@ import '../perfil/perfil.dart';
 import '../ayuda/centro_ayuda/centro_ayuda_screen.dart';
 
 class MainNavigation extends StatefulWidget {
-
   final String tipoHome;
 
   const MainNavigation({super.key, required this.tipoHome});
@@ -22,24 +21,12 @@ class _MainNavigationState extends State<MainNavigation> {
 
   int _selectedIndex = 0;
 
-  late final List<Widget> _pages;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _pages = [
-      _obtenerHome(),
-      Perfil(tipoPerfil: widget.tipoHome),
-      //const Center(child: Text("Ayuda")),
-      CentroAyudaScreen(),
-      const ConfiguracionPantalla(),
-    ];
-  }
-
+  /// 🔥 FUNCIÓN PARA OBTENER EL HOME CORRECTO
   Widget _obtenerHome() {
 
-    switch (widget.tipoHome) {
+    print("TipoHome recibido: ${widget.tipoHome}"); // 👈 debug opcional
+
+    switch (widget.tipoHome.toLowerCase()) {
 
       case "hipertension":
         return const HomeHipertension();
@@ -47,13 +34,12 @@ class _MainNavigationState extends State<MainNavigation> {
       case "diabetes":
         return const HomeDiabetes();
 
-      case "combinado":
+      case "hipertension y diabetes":
         return const HomeCombinado();
 
       default:
         return const HomeSano();
     }
-
   }
 
   void _onItemTapped(int index) {
@@ -65,11 +51,19 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
 
+    /// 🔥 LISTA DINÁMICA (IMPORTANTE)
+    final pages = [
+      _obtenerHome(),
+      Perfil(tipoPerfil: widget.tipoHome),
+      CentroAyudaScreen(),
+      const ConfiguracionPantalla(),
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.fondoPantallaPrincipal,
       extendBody: true,
 
-      body: _pages[_selectedIndex],
+      body: pages[_selectedIndex],
 
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -80,7 +74,8 @@ class _MainNavigationState extends State<MainNavigation> {
             child: BottomNavigationBar(
               backgroundColor: AppColors.colorBotonPrincipal,
               selectedItemColor: AppColors.textoClaro,
-              unselectedItemColor: AppColors.textoClaro.withOpacity(0.7),
+              unselectedItemColor:
+                  AppColors.textoClaro.withOpacity(0.7),
               showSelectedLabels: false,
               showUnselectedLabels: false,
               currentIndex: _selectedIndex,
@@ -90,27 +85,22 @@ class _MainNavigationState extends State<MainNavigation> {
               iconSize: 22,
 
               items: const [
-
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined),
                   label: "",
                 ),
-
                 BottomNavigationBarItem(
                   icon: Icon(Icons.person_outline),
                   label: "",
                 ),
-
                 BottomNavigationBarItem(
                   icon: Icon(Icons.help_outline),
                   label: "",
                 ),
-
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings_outlined),
                   label: "",
                 ),
-
               ],
             ),
           ),

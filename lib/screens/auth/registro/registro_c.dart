@@ -6,8 +6,6 @@ import 'package:prueba/screens/cuestionario/cuestionario.dart';
 class RegistroC extends StatefulWidget {
   final String nombre;
   final String correo;
-
-  // 🔥 NUEVOS
   final String telefono;
   final String fecha;
 
@@ -15,8 +13,8 @@ class RegistroC extends StatefulWidget {
     super.key,
     required this.nombre,
     required this.correo,
-    required this.telefono, // 🔥
-    required this.fecha,    // 🔥
+    required this.telefono,
+    required this.fecha,
   });
 
   @override
@@ -32,6 +30,7 @@ class _RegistroCState extends State<RegistroC> {
   bool _todoValido() {
     return passCtrl.text.isNotEmpty &&
         confirmCtrl.text.isNotEmpty &&
+        passCtrl.text.length >= 8 &&
         passCtrl.text == confirmCtrl.text;
   }
 
@@ -80,12 +79,10 @@ class _RegistroCState extends State<RegistroC> {
             size: 16,
             color: AppColors.colorBotonPrincipal,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Crear Contraseña",
+          "Crear contraseña",
           style: AppTextStyles.appBar,
         ),
       ),
@@ -99,7 +96,14 @@ class _RegistroCState extends State<RegistroC> {
             const SizedBox(height: 10),
 
             const Text(
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+              "Crea una contraseña segura para proteger tu cuenta.",
+              style: AppTextStyles.secundario,
+            ),
+
+            const SizedBox(height: 5),
+
+            const Text(
+              "La contraseña debe tener mínimo 8 caracteres.",
               style: AppTextStyles.secundario,
             ),
 
@@ -123,6 +127,13 @@ class _RegistroCState extends State<RegistroC> {
                     ocultarPass = !ocultarPass;
                   });
                 },
+              ).copyWith(
+                helperText: "Usa al menos 8 caracteres",
+                errorText: passCtrl.text.isEmpty
+                    ? null
+                    : (passCtrl.text.length < 8
+                        ? "La contraseña debe tener mínimo 8 caracteres"
+                        : null),
               ),
               onChanged: (_) => setState(() {}),
             ),
@@ -130,7 +141,7 @@ class _RegistroCState extends State<RegistroC> {
             const SizedBox(height: 20),
 
             const Text(
-              "Confirmar Contraseña",
+              "Confirmar contraseña",
               style: AppTextStyles.subtitulo,
             ),
 
@@ -147,6 +158,12 @@ class _RegistroCState extends State<RegistroC> {
                     ocultarConfirm = !ocultarConfirm;
                   });
                 },
+              ).copyWith(
+                errorText: confirmCtrl.text.isEmpty
+                    ? null
+                    : (confirmCtrl.text != passCtrl.text
+                        ? "Las contraseñas no coinciden"
+                        : null),
               ),
               onChanged: (_) => setState(() {}),
             ),
@@ -169,16 +186,14 @@ class _RegistroCState extends State<RegistroC> {
 
                           Future.delayed(
                               const Duration(milliseconds: 500), () {
-
-                            /// 🔥 AQUÍ PASAMOS TODO AL CUESTIONARIO
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => Cuestionario(
                                   nombre: widget.nombre,
                                   correo: widget.correo,
-                                  telefono: widget.telefono, // 🔥
-                                  fecha: widget.fecha,       // 🔥
+                                  telefono: widget.telefono,
+                                  fecha: widget.fecha,
                                 ),
                               ),
                             );
@@ -192,7 +207,7 @@ class _RegistroCState extends State<RegistroC> {
                     ),
                   ),
                   child: const Text(
-                    "Crear Cuenta",
+                    "Crear cuenta",
                     style: AppTextStyles.boton,
                   ),
                 ),

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'registro_c.dart';
 import 'package:prueba/screens/cuestionario/cuestionario.dart';
+import '../../ayuda/centro_ayuda/terminos_condiciones.dart';
+import '../../ayuda/centro_ayuda/politica_de_privacidad.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 
@@ -23,9 +26,29 @@ class _RegistroPState extends State<RegistroP> {
   String telefonoCompleto = '';
   TextEditingController telefonoController = TextEditingController();
 
+  bool correoValido = true;
+  bool aceptaTerminos = false;
+
+  int edad = 0;
+  bool esMayor = false;
+
+  // 🔴 calcular edad
+  int _calcularEdad(DateTime fechaNacimiento) {
+    final hoy = DateTime.now();
+
+    int edad = hoy.year - fechaNacimiento.year;
+
+    if (hoy.month < fechaNacimiento.month ||
+        (hoy.month == fechaNacimiento.month &&
+            hoy.day < fechaNacimiento.day)) {
+      edad--;
+    }
+
+    return edad;
+  }
+
   Future<UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
     if (googleUser == null) return null;
 
     final googleAuth = await googleUser.authentication;
@@ -47,8 +70,10 @@ class _RegistroPState extends State<RegistroP> {
     return nombreCtrl.text.isNotEmpty &&
         correoCtrl.text.isNotEmpty &&
         _isValidEmail(correoCtrl.text) &&
+        correoValido &&
         telefonoCompleto.isNotEmpty &&
-        fechaCtrl.text.isNotEmpty;
+        fechaCtrl.text.isNotEmpty &&
+        esMayor; // 🔴 BLOQUEA SI NO ES MAYOR
   }
 
   InputDecoration _inputDecoration() {
@@ -75,22 +100,16 @@ class _RegistroPState extends State<RegistroP> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.fondoRegistro,
+
       appBar: AppBar(
         backgroundColor: AppColors.fondoRegistro,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            size: 16,
-            color: AppColors.colorBotonPrincipal,
-          ),
+          icon: const Icon(Icons.arrow_back_ios, size: 16),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Crear Cuenta",
-          style: AppTextStyles.appBar,
-        ),
+        title: const Text("Crear cuenta", style: AppTextStyles.appBar),
       ),
 
       body: SingleChildScrollView(
@@ -99,9 +118,7 @@ class _RegistroPState extends State<RegistroP> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            const SizedBox(height: 10),
-
-            const Text("Nombre Completo", style: AppTextStyles.subtitulo),
+            const Text("Nombre completo", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             TextField(
               controller: nombreCtrl,
@@ -111,18 +128,24 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 20),
 
-            const Text("Correo", style: AppTextStyles.subtitulo),
+            const Text("Correo electrónico", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             TextField(
               controller: correoCtrl,
               keyboardType: TextInputType.emailAddress,
-              decoration: _inputDecoration(),
-              onChanged: (_) => setState(() {}),
+              decoration: _inputDecoration().copyWith(
+                errorText: correoValido ? null : "Correo inválido",
+              ),
+              onChanged: (value) {
+                setState(() {
+                  correoValido = _isValidEmail(value) || value.isEmpty;
+                });
+              },
             ),
 
             const SizedBox(height: 20),
 
-            const Text("Número de Teléfono", style: AppTextStyles.subtitulo),
+            const Text("Número de teléfono", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             IntlPhoneField(
               controller: telefonoController,
@@ -137,7 +160,7 @@ class _RegistroPState extends State<RegistroP> {
 
             const SizedBox(height: 20),
 
-            const Text("Fecha de Nacimiento", style: AppTextStyles.subtitulo),
+            const Text("Fecha de nacimiento", style: AppTextStyles.subtitulo),
             const SizedBox(height: 8),
             TextField(
               controller: fechaCtrl,
@@ -146,46 +169,122 @@ class _RegistroPState extends State<RegistroP> {
               onTap: () async {
                 DateTime? fecha = await showDatePicker(
                   context: context,
+                  locale: const Locale('es', 'ES'),
                   initialDate: DateTime.now(),
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                 );
+
                 if (fecha != null) {
+                  final edadCalculada = _calcularEdad(fecha);
+
+                  setState(() {
+                    edad = edadCalculada;
+                    esMayor = edadCalculada >= 18;
+                  });
+
+                  if (!esMayor) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Debes ser mayor de 18 años"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+
                   fechaCtrl.text =
                       "${fecha.day}/${fecha.month}/${fecha.year}";
-                  setState(() {});
                 }
               },
             ),
 
-            const SizedBox(height: 30),
-
-            const Center(
-              child: Text(
-                "By continuing, you agree to\nTerms of Use and Privacy Policy.",
-                textAlign: TextAlign.center,
-                style: AppTextStyles.pequeno,
+            // 🔴 MOSTRAR EDAD
+            if (fechaCtrl.text.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  esMayor
+                      ? "Edad: $edad años"
+                      : "Edad: $edad años (Debe ser mayor de 18)",
+                  style: TextStyle(
+                    color: esMayor ? Colors.green : Colors.red,
+                  ),
+                ),
               ),
-            ),
 
             const SizedBox(height: 25),
 
-            /// 🔥 BOTÓN CORREGIDO
+            Row(
+              children: [
+                Checkbox(
+                  value: aceptaTerminos,
+                  activeColor: AppColors.colorBotonPrincipal,
+                  onChanged: (value) {
+                    setState(() {
+                      aceptaTerminos = value ?? false;
+                    });
+                  },
+                ),
+                const Expanded(
+                  child: Text(
+                    "Acepto los Términos y Condiciones y la Política de Privacidad",
+                    style: AppTextStyles.pequeno,
+                  ),
+                ),
+              ],
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TerminosCondiciones(),
+                      ),
+                    );
+                  },
+                  child: const Text("Ver términos"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PoliticaDePrivacidadScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text("Ver privacidad"),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
             Center(
               child: SizedBox(
                 width: 220,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _todosCamposCompletos()
-                      ? () {
+                  onPressed: (_todosCamposCompletos() && aceptaTerminos)
+                      ? () async {
+
+                          final prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs.setString(
+                              "correo", correoCtrl.text.trim());
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => RegistroC(
                                 nombre: nombreCtrl.text,
                                 correo: correoCtrl.text,
-                                telefono: telefonoCompleto, // 🔥
-                                fecha: fechaCtrl.text,       // 🔥
+                                telefono: telefonoCompleto,
+                                fecha: fechaCtrl.text,
                               ),
                             ),
                           );
@@ -197,26 +296,17 @@ class _RegistroPState extends State<RegistroP> {
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: const Text(
-                    "Siguiente",
-                    style: AppTextStyles.boton,
-                  ),
+                  child: const Text("Siguiente", style: AppTextStyles.boton),
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            const Center(
-              child: Text(
-                "or sign up with",
-                style: AppTextStyles.secundario,
-              ),
-            ),
+            const Center(child: Text("o regístrate con")),
 
             const SizedBox(height: 20),
 
-            /// 🔥 GOOGLE TAMBIÉN PASA DATOS VACÍOS (para no romper flujo)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -229,37 +319,34 @@ class _RegistroPState extends State<RegistroP> {
                   ),
                   child: IconButton(
                     onPressed: () async {
-                      try {
-                        final userCredential = await signInWithGoogle();
+                      final userCredential = await signInWithGoogle();
 
-                        if (userCredential != null &&
-                            userCredential.user != null) {
+                      if (userCredential != null &&
+                          userCredential.user != null) {
 
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => Cuestionario(
-                                nombre: userCredential.user?.displayName ?? '',
-                                correo: userCredential.user?.email ?? '',
-                                telefono: "", // 🔥 importante
-                                fecha: "",    // 🔥 importante
-                              ),
+                        final prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setString(
+                          "correo",
+                          userCredential.user?.email ?? "",
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Cuestionario(
+                              nombre:
+                                  userCredential.user?.displayName ?? '',
+                              correo:
+                                  userCredential.user?.email ?? '',
+                              telefono: "",
+                              fecha: "",
                             ),
-                          );
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Error: $e"),
-                            backgroundColor: AppColors.error,
                           ),
                         );
                       }
                     },
-                    icon: const Icon(
-                      Icons.g_mobiledata,
-                      color: AppColors.colorPrincipal,
-                    ),
+                    icon: const Icon(Icons.g_mobiledata),
                   ),
                 ),
               ],

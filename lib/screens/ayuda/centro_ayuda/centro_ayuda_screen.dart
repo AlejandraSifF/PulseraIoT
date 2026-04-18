@@ -21,13 +21,6 @@ class CentroAyudaScreen extends StatelessWidget {
           'Centro De Ayuda',
           style: AppTextStyles.appBarLight,
         ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColors.textoClaro,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
         centerTitle: true,
       ),
 

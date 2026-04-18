@@ -23,19 +23,21 @@ class HomeHipertension extends StatelessWidget {
           child: Column(
             children: [
 
-              /// HEADER
+              /// 🔥 HEADER DINÁMICO
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Hola, Bienvenido",
                         style: AppTextStyles.secundario,
                       ),
                       Text(
-                        "John Doe",
+                        perfilProvider.nombre.isNotEmpty
+                            ? perfilProvider.nombre
+                            : "Usuario",
                         style: AppTextStyles.subtitulo,
                       ),
                     ],
@@ -52,7 +54,7 @@ class HomeHipertension extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              /// PERFIL CARD
+              /// 🔥 PERFIL CARD DINÁMICO
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -72,17 +74,19 @@ class HomeHipertension extends StatelessWidget {
 
                     const SizedBox(width: 15),
 
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Javier\nHernandez",
+                            perfilProvider.nombre.isNotEmpty
+                                ? perfilProvider.nombre
+                                : "Nombre completo",
                             style: AppTextStyles.subtitulo,
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            "72 años",
+                            "${perfilProvider.edad} años",
                             style: AppTextStyles.secundario,
                           ),
                         ],
@@ -107,7 +111,7 @@ class HomeHipertension extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              /// CARDS
+              /// 🔥 CARDS
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(

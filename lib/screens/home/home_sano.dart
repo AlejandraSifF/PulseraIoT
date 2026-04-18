@@ -22,14 +22,14 @@ class HomeSano extends StatelessWidget {
           child: Column(
             children: [
 
-              /// HEADER
+              /// 🔥 HEADER DINÁMICO
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Hola, Bienvenido",
                         style: TextStyle(
                           fontSize: 14,
@@ -37,8 +37,10 @@ class HomeSano extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "John Doe",
-                        style: TextStyle(
+                        perfilProvider.nombre.isNotEmpty
+                            ? perfilProvider.nombre
+                            : "Usuario",
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textoOscuro,
@@ -58,7 +60,7 @@ class HomeSano extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              /// PERFIL CARD
+              /// 🔥 PERFIL CARD DINÁMICO
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -81,19 +83,21 @@ class HomeSano extends StatelessWidget {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            "Javier\nHernandez",
-                            style: TextStyle(
+                            perfilProvider.nombre.isNotEmpty
+                                ? perfilProvider.nombre
+                                : "Nombre completo",
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textoOscuro,
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
-                            "72 años",
-                            style: TextStyle(
+                            "${perfilProvider.edad} años",
+                            style: const TextStyle(
                               color: AppColors.textoSecundario,
                             ),
                           ),
@@ -123,7 +127,7 @@ class HomeSano extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              /// CARDS
+              /// 🔥 CARDS
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -178,9 +182,6 @@ class HomeSano extends StatelessWidget {
                       _buildUbicacionCard(
                         "Ubicación",
                         "Zacatecas, Centro",
-                        "Crítico",
-                        AppColors.error,
-                        Icons.location_on,
                       ),
                     ],
                   ),
@@ -266,13 +267,7 @@ class HomeSano extends StatelessWidget {
     );
   }
 
-  Widget _buildUbicacionCard(
-    String title,
-    String value,
-    String status,
-    Color statusColor,
-    IconData icon,
-  ) {
+  Widget _buildUbicacionCard(String title, String value) {
     return Container(
       width: 291,
       height: 137,
