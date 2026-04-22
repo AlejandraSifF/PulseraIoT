@@ -9,8 +9,8 @@ const testUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash('123456', salt);
 
     const user = await User.create({
-      name: 'Prueba2',
-      email: 'prueba@test2.com',
+      name: 'Prueba3',
+      email: 'prueba@test3.com',
       password: hashedPassword,
     });
 
@@ -71,9 +71,11 @@ const register = async (req, res) => {
     });
 
   } catch (error) {
+    console.log('Error en register:', error);
     res.status(500).json({
       ok: false,
-      message: 'Error interno del servidor'
+      message: 'Error interno del servidor',
+      message: error.message
     });
   }
 };
