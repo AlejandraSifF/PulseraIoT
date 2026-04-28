@@ -9,7 +9,7 @@ import '../../ayuda/centro_ayuda/terminos_condiciones.dart';
 import '../../ayuda/centro_ayuda/politica_de_privacidad.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
-import '../../../services/auth_service.dart';
+//import '../../../services/auth_service.dart';
 
 class RegistroP extends StatefulWidget {
   const RegistroP({super.key});
@@ -273,22 +273,10 @@ class _RegistroPState extends State<RegistroP> {
                   onPressed: (_todosCamposCompletos() && aceptaTerminos)
                       ? () async {
 
-                        // REGISTRO CON BACKEND
-                          final response = await AuthService.register(
-                            name: nombreCtrl.text.trim(),
-                            email: correoCtrl.text.trim(),
-                            password: "123456", // CONTRASEÑA POR DEFECTO, SE CAMBIARÁ EN EL SIGUIENTE PASO
-                          );
-                          if (response['ok']) {
-                            final prefs = await SharedPreferences.getInstance();
-                            await prefs.setString("correo", correoCtrl.text.trim());
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Registro exitoso"),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
+                          final prefs =
+                              await SharedPreferences.getInstance();
+                          await prefs.setString(
+                              "correo", correoCtrl.text.trim());
 
                           Navigator.push(
                             context,
@@ -301,15 +289,7 @@ class _RegistroPState extends State<RegistroP> {
                               ),
                             ),
                           );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(response['message'] ?? "Error en el registro"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
                         }
-                      }
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.colorBotonPrincipal,

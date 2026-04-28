@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../theme/app_colors.dart';
+import '../../../services/auth_service.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -12,6 +13,9 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   bool ocultarPassword = true;
+
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
 
   Future<UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -27,6 +31,13 @@ class _LoginFormState extends State<LoginForm> {
     );
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -75,6 +86,7 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 5),
 
             TextField(
+              controller: emailCtrl,
               decoration: InputDecoration(
                 hintText: "example@example.com",
                 filled: true,
@@ -93,6 +105,7 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 5),
 
             TextField(
+              controller: passCtrl,
               obscureText: ocultarPassword,
               decoration: InputDecoration(
                 filled: true,
@@ -118,7 +131,7 @@ class _LoginFormState extends State<LoginForm> {
 
             const SizedBox(height: 30),
 
-            /// BOTON LOGIN
+            /// BOTON LOGIN 🔥
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -129,7 +142,30 @@ class _LoginFormState extends State<LoginForm> {
                     borderRadius: BorderRadius.circular(25),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  final response = await AuthService.login(
+                    email: emailCtrl.text.trim(),
+                    password: passCtrl.text.trim(),
+                  );
+
+                  if (response['ok']) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Login exitoso"),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+
+                    // Aquí luego puedes navegar a Home
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(response['message'] ?? "Error"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
                 child: const Text(
                   "Iniciar Sesión",
                   style: TextStyle(
@@ -142,7 +178,7 @@ class _LoginFormState extends State<LoginForm> {
 
             const SizedBox(height: 15),
 
-            /// BOTON GOOGLE
+            /// GOOGLE
             SizedBox(
               width: double.infinity,
               height: 50,

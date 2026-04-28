@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import 'package:prueba/screens/cuestionario/cuestionario.dart';
+import '../../../services/auth_service.dart'; // 👈 IMPORTANTE
 
 class RegistroC extends StatefulWidget {
   final String nombre;
@@ -176,28 +177,47 @@ class _RegistroCState extends State<RegistroC> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: _todoValido()
-                      ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Cuenta creada con éxito"),
-                              backgroundColor: AppColors.exito,
-                            ),
+                      ? () async {
+
+                          // 🔥 AQUÍ SE HACE EL REGISTRO REAL
+                          final response = await AuthService.register(
+                            name: widget.nombre,
+                            email: widget.correo,
+                            password: passCtrl.text,
                           );
 
-                          Future.delayed(
-                              const Duration(milliseconds: 500), () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => Cuestionario(
-                                  nombre: widget.nombre,
-                                  correo: widget.correo,
-                                  telefono: widget.telefono,
-                                  fecha: widget.fecha,
-                                ),
+                          if (response['ok']) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Cuenta creada con éxito"),
+                                backgroundColor: AppColors.exito,
                               ),
                             );
-                          });
+
+                            Future.delayed(
+                                const Duration(milliseconds: 500), () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => Cuestionario(
+                                    nombre: widget.nombre,
+                                    correo: widget.correo,
+                                    telefono: widget.telefono,
+                                    fecha: widget.fecha,
+                                  ),
+                                ),
+                              );
+                            });
+
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    response['message'] ?? "Error en registro"),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
