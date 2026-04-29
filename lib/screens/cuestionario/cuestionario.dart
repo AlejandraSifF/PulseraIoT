@@ -7,7 +7,6 @@ import '../../provider/perfil_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../services/auth_service.dart';
-
 class Cuestionario extends StatefulWidget {
   final String nombre;
   final String correo;
@@ -176,6 +175,7 @@ class _CuestionarioState extends State<Cuestionario> {
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
             hintText: "Edad (en años)",
+            hintStyle: AppTextStyles.secundario,
             filled: true,
             fillColor: AppColors.inputRegistro,
             border: OutlineInputBorder(
@@ -208,7 +208,8 @@ class _CuestionarioState extends State<Cuestionario> {
 
         CheckboxListTile(
           activeColor: AppColors.colorBotonPrincipal,
-          title: const Text("Hipertensión arterial"),
+          title: const Text("Hipertensión arterial",
+              style: AppTextStyles.option),
           value: tieneHipertension,
           onChanged: (v) => setState(() {
             tieneHipertension = v!;
@@ -218,7 +219,7 @@ class _CuestionarioState extends State<Cuestionario> {
 
         CheckboxListTile(
           activeColor: AppColors.colorBotonPrincipal,
-          title: const Text("Diabetes"),
+          title: const Text("Diabetes", style: AppTextStyles.option),
           value: tieneDiabetes,
           onChanged: (v) => setState(() {
             tieneDiabetes = v!;
@@ -228,7 +229,7 @@ class _CuestionarioState extends State<Cuestionario> {
 
         CheckboxListTile(
           activeColor: AppColors.colorBotonPrincipal,
-          title: const Text("Ninguna"),
+          title: const Text("Ninguna", style: AppTextStyles.option),
           value: tieneNinguna,
           onChanged: (tieneHipertension || tieneDiabetes)
               ? null
@@ -260,11 +261,12 @@ class _CuestionarioState extends State<Cuestionario> {
         _subtitulo("Movilidad"),
         _radio("Camina sin ayuda", movilidad, (v) => movilidad = v),
         _radio("Usa bastón", movilidad, (v) => movilidad = v),
+        _radio("Usa andadera", movilidad, (v) => movilidad = v),
         _radio("Silla de ruedas", movilidad, (v) => movilidad = v),
 
         const SizedBox(height: 10),
 
-        _subtitulo("¿Toma medicamentos?"),
+        _subtitulo("¿Toma medicamentos diariamente?"),
         _radio("Sí", medicacion, (v) => medicacion = v),
         _radio("No", medicacion, (v) => medicacion = v),
       ],
@@ -282,6 +284,7 @@ class _CuestionarioState extends State<Cuestionario> {
           controller: nombreContactoCtrl,
           decoration: InputDecoration(
             hintText: "Nombre del contacto",
+            hintStyle: AppTextStyles.secundario,
             filled: true,
             fillColor: AppColors.inputRegistro,
             border: OutlineInputBorder(
@@ -297,7 +300,8 @@ class _CuestionarioState extends State<Cuestionario> {
           controller: telefonoContactoCtrl,
           initialCountryCode: codigoPais,
           decoration: InputDecoration(
-            hintText: "Teléfono",
+            hintText: "Teléfono del contacto",
+            hintStyle: AppTextStyles.secundario,
             filled: true,
             fillColor: AppColors.inputRegistro,
             border: OutlineInputBorder(
@@ -308,77 +312,193 @@ class _CuestionarioState extends State<Cuestionario> {
           ),
           onChanged: (phone) {
             codigoEmergencia = phone.countryCode;
+
+            if (phone.number.length < 8) {
+              setState(() {
+                errorTelefono = "Número inválido";
+              });
+            } else {
+              setState(() {
+                errorTelefono = null;
+              });
+            }
           },
         ),
       ],
     );
   }
 
-  // ================= FINAL =================
+  // ================= VALIDACIONES =================
+
+  bool _validarPaso1() {
+    int? edad = int.tryParse(edadCtrl.text);
+
+    if (edad == null || edad < 65) {
+      _mensaje("Edad inválida (65+)");
+      return false;
+    }
+
+    if (sexoSeleccionado == null) {
+      _mensaje("Selecciona el sexo");
+      return false;
+    }
+
+    if (viveSolo == null) {
+      _mensaje("Indica si vive solo(a)");
+      return false;
+    }
+
+    if (!tieneHipertension && !tieneDiabetes && !tieneNinguna) {
+      _mensaje("Selecciona condición de salud");
+      return false;
+    }
+
+    if (caidasRecientes == null) {
+      _mensaje("Responde sobre caídas");
+      return false;
+    }
+
+    if (movilidad == null) {
+      _mensaje("Selecciona movilidad");
+      return false;
+    }
+
+    if (medicacion == null) {
+      _mensaje("Indica medicamentos");
+      return false;
+    }
+
+    return true;
+  }
+
+  bool _validarPaso2() {
+    if (nombreContactoCtrl.text.isEmpty) {
+      _mensaje("Ingresa el nombre del contacto");
+      return false;
+    }
+
+    if (telefonoContactoCtrl.text.isEmpty || errorTelefono != null) {
+      _mensaje("Teléfono inválido");
+      return false;
+    }
+
+    return true;
+  }
+
+  // 🔥 SnackBar con color de la app
+  void _mensaje(String texto) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          texto,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.colorBotonPrincipal,
+      ),
+    );
+  }
+
+  // ================= LÓGICA =================
 
   void _siguientePaso() {
     if (pasoActual == 0) {
+      if (!_validarPaso1()) return;
       setState(() => pasoActual++);
       return;
     }
 
     if (pasoActual == 1) {
-      _finalizarCuestionario();
+      if (!_validarPaso2()) return;
+      _confirmarFinal(); // 👈 aquí el popup
     }
+  }
+
+  // 🔥 Popup de confirmación
+  void _confirmarFinal() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Confirmar"),
+        content: const Text("¿Deseas guardar la información?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              "Cancelar",
+              style: TextStyle(color: AppColors.colorBotonPrincipal),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _finalizarCuestionario();
+            },
+            child: Text(
+              "Guardar",
+              style: TextStyle(color: AppColors.colorBotonPrincipal),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _finalizarCuestionario() async {
 
-    final perfilProvider =
-        Provider.of<PerfilProvider>(context, listen: false);
+  final perfilProvider =
+      Provider.of<PerfilProvider>(context, listen: false);
 
-    String tipoHome;
+  String tipoHome;
 
-    if (tieneHipertension && tieneDiabetes) {
-      tipoHome = "Hipertension y Diabetes";
-    } else if (tieneHipertension) {
-      tipoHome = "Hipertension";
-    } else if (tieneDiabetes) {
-      tipoHome = "Diabetes";
-    } else {
-      tipoHome = "Sano";
-    }
-
-    final telefonoCompleto =
-        "$codigoEmergencia${telefonoContactoCtrl.text}";
-
-    // 🔥 GUARDAR EN BACKEND
-    await AuthService.guardarCuestionario(
-      email: widget.correo,
-      edad: int.parse(edadCtrl.text),
-      sexo: sexoSeleccionado!,
-      viveSolo: viveSolo!,
-      hipertension: tieneHipertension,
-      diabetes: tieneDiabetes,
-      caidas: caidasRecientes!,
-      movilidad: movilidad!,
-      medicacion: medicacion!,
-      contactoNombre: nombreContactoCtrl.text,
-      contactoTelefono: telefonoCompleto,
-    );
-
-    // 🔹 LOCAL (no lo quitamos)
-    await perfilProvider.guardarDatos(
-      nombre: widget.nombre,
-      edad: int.parse(edadCtrl.text),
-      sexo: sexoSeleccionado!,
-      nombreContacto: nombreContactoCtrl.text,
-      telefonoContacto: telefonoCompleto,
-      telefonoUsuario: widget.telefono,
-      fechaNacimiento: widget.fecha,
-    );
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MainNavigation(tipoHome: tipoHome),
-      ),
-      (route) => false,
-    );
+  if (tieneHipertension && tieneDiabetes) {
+    tipoHome = "Hipertension y Diabetes";
+  } else if (tieneHipertension) {
+    tipoHome = "Hipertension";
+  } else if (tieneDiabetes) {
+    tipoHome = "Diabetes";
+  } else {
+    tipoHome = "Sano";
   }
+
+  final telefonoCompleto =
+      "$codigoEmergencia${telefonoContactoCtrl.text}";
+
+  // ✅ Guardado local (opcional)
+  await perfilProvider.guardarDatos(
+    nombre: widget.nombre,
+    edad: int.parse(edadCtrl.text),
+    sexo: sexoSeleccionado!,
+    nombreContacto: nombreContactoCtrl.text,
+    telefonoContacto: telefonoCompleto,
+    telefonoUsuario: widget.telefono,
+    fechaNacimiento: widget.fecha,
+  );
+
+  // 🔥 NUEVO: GUARDAR EN BACKEND
+  final response = await AuthService.guardarCuestionario(
+    nombre: widget.nombre,
+    correo: widget.correo,
+    tipoHome: tipoHome,
+    edad: int.parse(edadCtrl.text),
+    sexo: sexoSeleccionado!,
+    viveSolo: viveSolo!,
+    hipertension: tieneHipertension,
+    diabetes: tieneDiabetes,
+    caidas: caidasRecientes!,
+    movilidad: movilidad!,
+    medicacion: medicacion!,
+    contactoNombre: nombreContactoCtrl.text,
+    contactoTelefono: telefonoCompleto,
+  );
+
+  print(response); // 🔍 DEBUG
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => MainNavigation(tipoHome: tipoHome),
+    ),
+    (route) => false,
+  );
+}
 }

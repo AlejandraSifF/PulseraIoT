@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../../theme/app_colors.dart';
 import '../../../services/auth_service.dart';
+import '../../navigation/main_navigation.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -81,7 +82,6 @@ class _LoginFormState extends State<LoginForm> {
 
             const SizedBox(height: 25),
 
-            /// CORREO
             const Text("Correo"),
             const SizedBox(height: 5),
 
@@ -100,7 +100,6 @@ class _LoginFormState extends State<LoginForm> {
 
             const SizedBox(height: 20),
 
-            /// PASSWORD
             const Text("Contraseña"),
             const SizedBox(height: 5),
 
@@ -131,7 +130,7 @@ class _LoginFormState extends State<LoginForm> {
 
             const SizedBox(height: 30),
 
-            /// BOTON LOGIN 🔥
+            /// 🔥 LOGIN
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -143,12 +142,24 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                 ),
                 onPressed: () async {
+
                   final response = await AuthService.login(
                     email: emailCtrl.text.trim(),
                     password: passCtrl.text.trim(),
                   );
 
+                  // 🔥 DEBUG
+                  print("RESPONSE: $response");
+
                   if (response['ok']) {
+
+                    // 🔥 SEGURO (NO CRASHEA)
+                    final tipoHome =
+                        response['user']?['tipoHome'] ??
+                        response['tipoHome'];
+
+                    print("TIPO HOME: $tipoHome");
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("Login exitoso"),
@@ -156,7 +167,26 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     );
 
-                    // Aquí luego puedes navegar a Home
+                    // 🔥 SI NO TIENE CUESTIONARIO
+                    if (tipoHome == null || tipoHome.toString().isEmpty) {
+                      Navigator.pushReplacementNamed(context, '/cuestionario');
+                      return;
+                    }
+
+                    // 🔥 NORMALIZAR (importante)
+                    final tipoHomeNormalizado =
+                        tipoHome.toString().toLowerCase();
+
+                    // 🔥 REDIRECCIÓN
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => MainNavigation(
+                          tipoHome: tipoHomeNormalizado,
+                        ),
+                      ),
+                    );
+
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

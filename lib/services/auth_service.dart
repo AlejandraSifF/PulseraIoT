@@ -4,7 +4,10 @@ import 'package:http/http.dart' as http;
 class AuthService {
   static const String baseUrl = 'http://10.0.2.2:3000/api/auth';
 
-  // 🔹 REGISTRO
+  // 🔥 GUARDA EL TOKEN AQUÍ
+  static String? token;
+
+  // ================= REGISTRO =================
   static Future<Map<String, dynamic>> register({
     required String name,
     required String email,
@@ -27,7 +30,7 @@ class AuthService {
     return jsonDecode(response.body);
   }
 
-  // 🔹 LOGIN
+  // ================= LOGIN =================
   static Future<Map<String, dynamic>> login({
     required String email,
     required String password,
@@ -45,12 +48,21 @@ class AuthService {
       }),
     );
 
-    return jsonDecode(response.body);
+    final data = jsonDecode(response.body);
+
+    // 🔥 GUARDAR TOKEN
+    if (data['ok']) {
+      token = data['token'];
+    }
+
+    return data;
   }
 
-  // 🔹 GUARDAR CUESTIONARIO 🔥
+  // ================= CUESTIONARIO =================
   static Future<Map<String, dynamic>> guardarCuestionario({
-    required String email,
+    required String nombre,
+    required String correo,
+    required String tipoHome,
     required int edad,
     required String sexo,
     required String viveSolo,
@@ -68,9 +80,12 @@ class AuthService {
       url,
       headers: {
         'Content-Type': 'application/json',
+        'x-token': token ?? '', // ✅ CORRECTO
       },
       body: jsonEncode({
-        'email': email,
+        'nombre': nombre,
+        'correo': correo,
+        'tipoHome': tipoHome,
         'edad': edad,
         'sexo': sexo,
         'viveSolo': viveSolo,

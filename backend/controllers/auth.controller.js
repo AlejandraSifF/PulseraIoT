@@ -269,7 +269,8 @@ const changeEmail = async (req, res) => {
   }
 };
 
-
+console.log("BODY:", req.body);
+console.log("UID:", req.uid);
 
 module.exports = {
   testUser,

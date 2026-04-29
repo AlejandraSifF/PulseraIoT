@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import 'package:prueba/screens/cuestionario/cuestionario.dart';
-import '../../../services/auth_service.dart'; // 👈 IMPORTANTE
+import '../../../services/auth_service.dart'; 
 
 class RegistroC extends StatefulWidget {
   final String nombre;
@@ -179,7 +179,7 @@ class _RegistroCState extends State<RegistroC> {
                   onPressed: _todoValido()
                       ? () async {
 
-                          // 🔥 AQUÍ SE HACE EL REGISTRO REAL
+                          // 🔥 REGISTRO
                           final response = await AuthService.register(
                             name: widget.nombre,
                             email: widget.correo,
@@ -187,6 +187,25 @@ class _RegistroCState extends State<RegistroC> {
                           );
 
                           if (response['ok']) {
+
+                            // 🔥 LOGIN AUTOMÁTICO (CLAVE)
+                            final loginResp = await AuthService.login(
+                              email: widget.correo,
+                              password: passCtrl.text,
+                            );
+
+                            print("TOKEN DESPUÉS DE REGISTER: ${AuthService.token}");
+
+                            if (!loginResp['ok']) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Error en login automático"),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text("Cuenta creada con éxito"),
@@ -194,20 +213,18 @@ class _RegistroCState extends State<RegistroC> {
                               ),
                             );
 
-                            Future.delayed(
-                                const Duration(milliseconds: 500), () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => Cuestionario(
-                                    nombre: widget.nombre,
-                                    correo: widget.correo,
-                                    telefono: widget.telefono,
-                                    fecha: widget.fecha,
-                                  ),
+                            // 🔥 IR AL CUESTIONARIO YA CON TOKEN
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => Cuestionario(
+                                  nombre: widget.nombre,
+                                  correo: widget.correo,
+                                  telefono: widget.telefono,
+                                  fecha: widget.fecha,
                                 ),
-                              );
-                            });
+                              ),
+                            );
 
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
