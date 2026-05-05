@@ -1,6 +1,8 @@
+#este nuevo es con el ssd agregado
 # =============================
-# ESP32 + MAX30102 + MLX90614 + Web + LCD 16x2
+# ESP32 + MAX30102 + MLX90614 + Web
 # =============================
+import framebuf
 import network
 import socket
 import machine
@@ -19,6 +21,8 @@ PASSWORD = "L4b.50L1.N3t"
 # Buzzer (PWM en GPIO 27)
 # -----------------------------
 buzzer = machine.PWM(machine.Pin(27), freq=1000, duty=0)
+
+oled_display = None
 
 pulso_bajo = 60
 pulso_alto = 100
@@ -40,116 +44,6 @@ def play_melody(melody):
 alarm_melody     = [(1000, 0.3), (800, 0.3), (1000, 0.3)]
 christmas_melody = [(523, 0.3), (587, 0.3), (659, 0.3), (523, 0.3)]
 police_melody    = [(1000, 0.2), (1500, 0.2)] * 5
-
-# -----------------------------
-# LCD 16x2 - Pines y clase
-# -----------------------------
-LCD_RS = Pin(15, Pin.OUT)
-LCD_EN = Pin(2,  Pin.OUT)
-LCD_D4 = Pin(4,  Pin.OUT)
-LCD_D5 = Pin(18, Pin.OUT)
-LCD_D6 = Pin(19, Pin.OUT)
-LCD_D7 = Pin(5,  Pin.OUT)
-
-class LCD1602:
-    def __init__(self, rs, en, d4, d5, d6, d7):
-        self.rs = rs; self.en = en
-        self.data_pins = [d4, d5, d6, d7]
-        self._init_pins()
-        time.sleep_ms(50)
-        self._init_lcd()
-
-    def _init_pins(self):
-        self.rs.init(Pin.OUT); self.en.init(Pin.OUT)
-        for p in self.data_pins: p.init(Pin.OUT)
-
-    def _pulse(self):
-        self.en.value(0); time.sleep_us(1)
-        self.en.value(1); time.sleep_us(1)
-        self.en.value(0); time.sleep_us(100)
-
-    def _nibble(self, d):
-        # Enviar 4 bits, LSB->MSB a los pines D4..D7
-        for i, p in enumerate(self.data_pins):
-            p.value((d >> i) & 1)
-        self._pulse()
-
-    def _byte(self, d, mode):
-        # mode=0 comando, mode=1 datos
-        self.rs.value(mode)
-        self._nibble(d >> 4)
-        self._nibble(d & 0x0F)
-
-    def _init_lcd(self):
-        self.rs.value(0)
-        for _ in range(3):
-            self._nibble(0x03)
-            time.sleep_ms(5)
-        self._nibble(0x02)            # 4-bit
-        self._byte(0x28, 0)           # 2 líneas, 5x8
-        self._byte(0x0C, 0)           # Display ON
-        self._byte(0x06, 0)           # Cursor inc
-        self.clear()
-
-    def clear(self):
-        self._byte(0x01, 0)
-        time.sleep_ms(2)
-
-    def set_cursor(self, col, row):
-        addr = 0x80 + (row * 0x40) + col
-        self._byte(addr, 0)
-
-    def print_str(self, s):
-        # Enviar exactamente lo que llega (máx 16 caracteres por línea)
-        for ch in s[:16]:
-            self._byte(ord(ch), 1)
-
-lcd = LCD1602(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7)
-
-# ---------- Helper para rellenar/recortar a 16 chars (sin str.ljust) ----------
-def pad(s, length=16):
-    """Rellena con espacios o recorta a 'length' caracteres (compat. MicroPython)."""
-    if s is None:
-        s = ""
-    L = len(s)
-    if L < length:
-        return s + (" " * (length - L))
-    else:
-        return s[:length]
-
-# ---------- Mostrar HR, SpO2 y Temp en LCD ----------
-def display_vitals(bpm, spo2, temp_c, alarm_active):
-    """
-    Línea 1: HR y SpO2  (ej. 'HR:75 SpO2:97%')
-    Línea 2: Temp y estado (ej. 'Temp:36.8C Normal')
-    Si alarma: pantalla de alerta.
-    """
-    lcd.clear()
-
-    if alarm_active:
-        lcd.set_cursor(0, 0); lcd.print_str(pad("  ALARMA ACTIVA ", 16))
-        lcd.set_cursor(0, 1); lcd.print_str(pad("  REVISE AL BEBE", 16))
-        return
-
-    # Formateo seguro
-    hr_txt = "--"   if bpm    is None else "{:0.0f}".format(bpm)
-    sp_txt = "--"   if spo2   is None else "{:0.0f}".format(spo2)
-    tp_txt = "--.-" if temp_c is None else "{:0.1f}".format(temp_c)
-
-    # Línea 1 (máx 16)
-    line1 = "{}bpm SpO2:{}%".format(hr_txt, sp_txt)
-    lcd.set_cursor(0, 0); lcd.print_str(pad(line1, 16))
-
-    # Clasificación breve de temperatura
-    temp_cat_short = latest_temp_cat
-    if temp_cat_short == "sin dato": temp_cat_short = "Sin dato"
-    elif temp_cat_short == "normal": temp_cat_short = "Normal"
-    elif temp_cat_short == "baja":   temp_cat_short = "Baja"
-    elif temp_cat_short == "alta":   temp_cat_short = "Alta"
-
-    # Línea 2 (máx 16)
-    line2 = "Temp:{}C {}".format(tp_txt, temp_cat_short)
-    lcd.set_cursor(0, 1); lcd.print_str(pad(line2, 16))
 
 # -----------------------------
 # MAX30102 (HR/SpO2) en SoftI2C (GPIO 21/22)
@@ -193,26 +87,191 @@ def read_sample_pair():
 # -----------------------------
 # MLX90614 (Temperatura bebé) en I2C(0) (GPIO 33/32)
 # -----------------------------
-mlx_i2c  = I2C(0, scl=Pin(33), sda=Pin(32), freq=100000)
-MLX_ADDR = 0x5A
+#mlx_i2c  = I2C(0, scl=Pin(33), sda=Pin(32), freq=100000)
+#MLX_ADDR = 0x5A
 
-def mlx_read_temp_reg(reg):
-    try:
-        data = mlx_i2c.readfrom_mem(MLX_ADDR, reg, 3)
-        raw  = data[0] | (data[1] << 8)
-        if raw == 0xFFFF or raw == 0x0000:
-            return None
-        return (raw * 0.02) - 273.15
-    except Exception:
-        return None
+def init_mlx90614():
 
-def read_temp_obj(): return mlx_read_temp_reg(0x07)  # Objeto (piel)
-def read_temp_amb(): return mlx_read_temp_reg(0x06)  # Ambiente (opcional)
+    """
+    Inicializa el bus I2C y el sensor MLX90614.
+    Retorna el objeto sensor listo para usarse.
+    """
+    from machine import I2C, Pin
+    import time
 
+    class MLX90614:
+        def __init__(self, i2c, addr=0x5A):
+            self.i2c = i2c
+            self.addr = addr
+
+        def _read16(self, reg):
+            data = self.i2c.readfrom_mem(self.addr, reg, 3)
+            return data[0] | (data[1] << 8)
+
+        def _temp(self, reg):
+            raw = self._read16(reg)
+            temp = raw * 0.02 - 273.15
+            return temp
+
+        def get_ambient_temp(self):
+            return self._temp(0x06)
+
+        def get_object_temp(self):
+            return self._temp(0x07)
+
+    # Configuración I2C para ESP32
+    i2c = I2C(
+        1,
+        scl=Pin(33),
+        sda=Pin(32),
+        freq=100000
+    )
+
+    sensor = MLX90614(i2c)
+    time.sleep(0.1)
+
+    return sensor
+
+
+def leer_temperatura_corporal(sensor, offset=0.0):
+    """
+    Lee la temperatura corporal desde el MLX90614.
+    offset permite calibrar la lectura si es necesario.
+    Retorna la temperatura en °C.
+    """
+    temp = sensor.get_object_temp()
+    return temp + offset
+
+
+sensor_temp = init_mlx90614()
+def read_temp_obj(): return leer_temperatura_corporal(sensor_temp, offset=1)#(sensor_temp, offset=+1.5)
+
+#sensor_temp = init_mlx90614()
+# Leer temperatura corporal
+#temperatura = leer_temperatura_corporal(sensor_temp)
+
+
+
+# ==================================================
+# DRIVER SSD1306 BASE
+# ==================================================
+
+class SSD1306(framebuf.FrameBuffer):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.pages = self.height // 8
+        self.buffer = bytearray(self.pages * self.width)
+        super().__init__(self.buffer, self.width, self.height, framebuf.MONO_VLSB)
+
+    def init_display(self):
+        for cmd in (
+            0xAE, 0x20, 0x00, 0x40, 0xA1, 0xC8,
+            0xDA, 0x12, 0x81, 0xCF, 0xA4, 0xA6,
+            0xD5, 0x80, 0x8D, 0x14, 0xAF
+        ):
+            self.write_cmd(cmd)
+        self.clear()
+
+    def clear(self):
+        self.fill(0)
+        self.show()
+
+    def show(self):
+        for page in range(self.pages):
+            self.write_cmd(0xB0 + page)
+            self.write_cmd(0x00)
+            self.write_cmd(0x10)
+            self.write_data(
+                self.buffer[self.width * page:self.width * (page + 1)]
+            )
+
+
+# ==================================================
+# DRIVER SSD1306 I2C
+# ==================================================
+
+class SSD1306(framebuf.FrameBuffer):
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.pages = self.height // 8
+        self.buffer = bytearray(self.pages * self.width)
+        super().__init__(self.buffer, self.width, self.height, framebuf.MONO_VLSB)
+
+    def init_display(self):
+        for cmd in (
+            0xAE, 0x20, 0x00, 0x40, 0xA1, 0xC8,
+            0xDA, 0x12, 0x81, 0xCF, 0xA4, 0xA6,
+            0xD5, 0x80, 0x8D, 0x14, 0xAF
+        ):
+            self.write_cmd(cmd)
+        self.fill(0)
+        self.show()
+
+    def show(self):
+        for page in range(self.pages):
+            self.write_cmd(0xB0 + page)
+            self.write_cmd(0x00)
+            self.write_cmd(0x10)
+            self.write_data(
+                self.buffer[self.width * page:self.width * (page + 1)]
+            )
+
+class SSD1306_I2C(SSD1306):
+    def __init__(self, width, height, i2c, addr=0x3C):
+        self.i2c = i2c
+        self.addr = addr
+        self.temp = bytearray(2)
+        super().__init__(width, height)
+        self.init_display()
+
+    def write_cmd(self, cmd):
+        self.temp[0] = 0x80
+        self.temp[1] = cmd
+        self.i2c.writeto(self.addr, self.temp)
+
+    def write_data(self, buf):
+        self.i2c.writeto(self.addr, b'\x40' + buf)
+
+
+
+# ==================================================
+# CLASE PRINCIPAL DE APLICACIÓN
+# ==================================================
+
+class VitalsDisplay:
+    def __init__(self):
+        self.i2c = I2C(0, scl=Pin(2), sda=Pin(4))
+        self.oled = SSD1306_I2C(128, 64, self.i2c)
+        self.oled.fill(0)
+        self.oled.text("Monitor Vital", 0, 0)
+        self.oled.text("--------------", 0, 10)
+        self.oled.show()
+
+    def update(self, bpm, spo2, temp, alarm):
+        self.oled.fill(0)
+
+        self.oled.text("Monitor Vital", 0, 0)
+
+        bpm_str  = "--" if bpm  is None else "{:.1f}".format(bpm)
+        spo2_str = "--" if spo2 is None else "{:.1f}".format(spo2)
+        temp_str = "--" if temp is None else "{:.1f}".format(temp)
+
+        self.oled.text("HR:   {} bpm".format(bpm_str), 0, 16)
+        self.oled.text("SpO2: {} %".format(spo2_str), 0, 28)
+        self.oled.text("Temp: {} C".format(temp_str), 0, 40)
+
+        if alarm:
+            self.oled.text("!!! ALARMA !!!", 0, 54)
+        else:
+            self.oled.text("Estado: OK", 0, 54)
+
+        self.oled.show()
 # -----------------------------
 # Umbrales temperatura Adulto mayor
 # -----------------------------
-TEMP_LOW_C      = 35.0
+TEMP_LOW_C      = 27.0
 TEMP_NORMAL_MAX = 37.9
 TEMP_HIGH_C     = 38.0
 
@@ -238,7 +297,6 @@ latest_temp_c    = None
 latest_temp_cat  = "sin dato"
 
 _last_print_ms   = time.ticks_ms()
-_last_display_ms = time.ticks_ms()
 alarm_active     = False
 
 # -----------------------------
@@ -258,7 +316,7 @@ def clear_alarm():
         alarm_active = False
 
 # -----------------------------
-# Procesamiento HR/SpO2 - 
+# Procesamiento HR/SpO2
 # -----------------------------
 def update_dc_ac(red, ir, alpha=0.95):
     global dc_red, dc_ir
@@ -269,7 +327,6 @@ def update_dc_ac(red, ir, alpha=0.95):
         dc_ir  = alpha*dc_ir  + (1-alpha)*ir
     return red - dc_red, ir - dc_ir, dc_red, dc_ir
 
-#  detect_peak ( más preciso)
 def detect_peak(ir_val):
     """
     Detecta picos en la señal IR usando el método de subida-bajada con buffer promedio.
@@ -277,9 +334,9 @@ def detect_peak(ir_val):
     """
     global ir_buffer, last_peak_time, last_ir_val, subiendo, bpm_list
     
-    THRESHOLD = 300  # Umbral sobre el promedio para considerar un pico
-    MIN_IBI = 600    # Inter-beat interval mínimo (100 BPM máx)
-    MAX_IBI = 1200   # Inter-beat interval máximo (50 BPM mín)
+    THRESHOLD =300  # Umbral sobre el promedio para considerar un pico
+    MIN_IBI = 700    # Inter-beat interval mínimo 600(100 BPM máx)
+    MAX_IBI = 1200   # Inter-beat interval máximo (50 BPM mín) era 1200
     
     # Mantener buffer de últimas 8 muestras para promedio
     ir_buffer.append(ir_val)
@@ -319,7 +376,6 @@ def detect_peak(ir_val):
     last_ir_val = ir_val
     return None
 
-# (calcula promedio de últimas mediciones)
 def estimate_bpm():
     """
     Estima BPM basado en el promedio de las últimas mediciones válidas.
@@ -351,7 +407,6 @@ def estimate_spo2(red_ac_buf, ir_ac_buf, dc_red, dc_ir):
 # Clasificación (y alarma)
 # -----------------------------
 def classify_spo2(spo2):
-    # Manteniendo tus límites:
     if spo2 is None:      return "sin dato"
     if spo2 <= 70:        trigger_alarm(); return "SpO2 baja"
     if spo2 >= 71:        clear_alarm();   return "normal"
@@ -371,7 +426,7 @@ def pulso_limites_diabetes(edad, movimiento):
     global pulso_bajo, pulso_alto
     if movimiento == "reposo":
         pulso_bajo = 60
-        pulso_alto = 100
+        pulso_alto = 108
     elif movimiento == "ejercitando":
         pulso_bajo = 60
         pulso_alto = 250
@@ -421,10 +476,10 @@ def update_temperature():
     latest_temp_cat = classify_temp(t)
 
 # -----------------------------
-# Loop de actualización (HR/SpO2/Temp + LCD)
+# Loop de actualización (HR/SpO2/Temp)
 # -----------------------------
 def update_vitals():
-    global latest_bpm, latest_spo2, latest_hr_cat, latest_spo2_cat, _last_print_ms, _last_display_ms
+    global latest_bpm, latest_spo2, latest_hr_cat, latest_spo2_cat, _last_print_ms
     try:
         # HR/SpO2 (llenar buffers)
         for _ in range(5):
@@ -453,13 +508,25 @@ def update_vitals():
             bstr = "--" if bpm  is None else f"{bpm:5.1f}"
             sstr = "--" if spo2 is None else f"{spo2:5.1f}"
             tstr = "--" if latest_temp_c is None else f"{latest_temp_c:4.2f}"
+
+            # Mensaje de alarma en terminal si está activa
+            if alarm_active:
+                print("ALARMA ACTIVA REVISE AL PACIENTE")
+            
+            
             print(f"HR: {bstr} bpm ({latest_hr_cat}) | SpO2: {sstr}% ({latest_spo2_cat}) | Temp: {tstr} °C ({latest_temp_cat})")
+
+            # AQUÍ se actualiza el OLED cada 1s
+            if oled_display is not None:
+                oled_display.update(
+                    latest_bpm,
+                    latest_spo2,
+                    latest_temp_c,
+                    alarm_active
+                )
+
             _last_print_ms = now
 
-        # Actualiza LCD cada ~1 s
-        if time.ticks_diff(now, _last_display_ms) >= 1000:
-            display_vitals(latest_bpm, latest_spo2, latest_temp_c, alarm_active)
-            _last_display_ms = now
 
     except OSError as e:
         print("Error I2C:", e, "→ Reinicializando MAX30102")
@@ -490,22 +557,18 @@ def connect_wifi():
     print("Conectando a WiFi...")
     while not wlan.isconnected():
         time.sleep(0.5)
-    print("Conectado:", wlan.ifconfig())
-    # Mostrar IP en LCD (opcional)
     ip = wlan.ifconfig()[0]
-    lcd.clear(); lcd.set_cursor(0, 0); lcd.print_str(pad("WiFi Conectado", 16))
-    lcd.set_cursor(0, 1); lcd.print_str(pad(ip[:16], 16))
-    time.sleep(2)
+    print("Conectado a WiFi:", ip)
     return ip
 
 # -----------------------------
 # Servidor HTTP (CORS)
 # -----------------------------
 def start_server(ip):
+    global oled_display
     max30102_init()
-    lcd.clear(); lcd.set_cursor(0, 0); lcd.print_str(pad("Servidor Activo", 16))
-    lcd.set_cursor(0, 1); lcd.print_str(pad("Esperando datos", 16))
-    time.sleep(1)
+    oled_display = VitalsDisplay()
+    print("Servidor Activo - Esperando datos...")
 
     addr = socket.getaddrinfo(ip, 80)[0][-1]
     s = socket.socket()
@@ -533,7 +596,11 @@ def start_server(ip):
         pulso_limites_diabetes_hipertencion(edad, movimiento)
     else:                                            
         pulso_limites_normal(edad, movimiento)
+    
+    print(f"Límites de pulso configurados: {pulso_bajo} - {pulso_alto} BPM")
     #-----------------------------------------------
+    oled_display = VitalsDisplay()
+
 
     while True:
         update_vitals()
@@ -557,13 +624,17 @@ def start_server(ip):
                         "Cache-Control: no-store\r\n"
                         "\r\nOK")
 
+            
             elif "GET /vitals" in request:
                 payload = vitals_json()
                 cl.send("HTTP/1.1 200 OK\r\n"
                         "Content-Type: application/json\r\n"
                         "Access-Control-Allow-Origin: *\r\n"
                         "Cache-Control: no-store\r\n"
-                        "\r\n" + payload)
+                        "Connection: close\r\n"
+                        "Content-Length: {}\r\n"
+                        "\r\n{}".format(len(payload), payload))
+
 
             else:
                 cl.send("HTTP/1.1 404 Not Found\r\n"
@@ -578,7 +649,8 @@ def start_server(ip):
 try:
     ip = connect_wifi()
     start_server(ip)
+    app = DisplayApp()
+    app.run()
 except Exception as e:
     print("Error crítico:", e)
-    lcd.clear(); lcd.set_cursor(0, 0); lcd.print_str(pad("Error del sist.", 16))
-    lcd.set_cursor(0, 1); lcd.print_str(pad("Reinicie", 16))
+    print("Reinicie el sistema")
