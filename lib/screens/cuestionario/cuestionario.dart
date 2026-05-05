@@ -496,9 +496,27 @@ class _CuestionarioState extends State<Cuestionario> {
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
-      builder: (_) => MainNavigation(tipoHome: tipoHome),
+      builder: (_) => MainNavigation(tipoHome: tipoHome.toLowerCase(), user: {
+        "name": widget.nombre,
+        "email": widget.correo,
+        "tipoHome": tipoHome,
+        "cuestionario": {
+          "edad": int.parse(edadCtrl.text),
+          "sexo": sexoSeleccionado,
+          "viveSolo": viveSolo,
+          "hipertension": tieneHipertension,
+          "diabetes": tieneDiabetes,
+          "caidasRecientes": caidasRecientes,
+          "movilidad": movilidad,
+          "medicacion": medicacion,
+          "contactoNombre": nombreContactoCtrl.text,
+          "contactoTelefono": telefonoCompleto,
+        }
+      }),
     ),
     (route) => false,
+    
   );
 }
+
 }

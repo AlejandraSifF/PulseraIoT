@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart'; // 🔥 IMPORT FALTANTE
 import '../../../theme/app_colors.dart';
 import '../../../services/auth_service.dart';
 import '../../navigation/main_navigation.dart';
+import '../../cuestionario/cuestionario.dart';
+import '../../../provider/perfil_provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -148,17 +151,32 @@ class _LoginFormState extends State<LoginForm> {
                     password: passCtrl.text.trim(),
                   );
 
-                  // 🔥 DEBUG
                   print("RESPONSE: $response");
 
                   if (response['ok']) {
 
-                    // 🔥 SEGURO (NO CRASHEA)
-                    final tipoHome =
-                        response['user']?['tipoHome'] ??
-                        response['tipoHome'];
+                    // 🔥 PROVIDER BIEN USADO
+                    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
 
-                    print("TIPO HOME: $tipoHome");
+                    final user = response['user'];
+                    final cuestionario = user['cuestionario'];
+
+                    // 🔥 GUARDAR DATOS CORRECTAMENTE
+                    await perfilProvider.guardarDatos(
+                      nombre: user['name'] ?? '',
+                      edad: cuestionario?['edad'] ?? 0,
+                      sexo: cuestionario?['sexo'] ?? '',
+                      nombreContacto: cuestionario?['contactoNombre'] ?? '',
+                      telefonoContacto: cuestionario?['contactoTelefono'] ?? '',
+                      telefonoUsuario: '',
+                      fechaNacimiento: '',
+                      correo: user['email'] ?? '',
+                    );
+
+                    final tipoHome = user['tipoHome'];
+
+                    print("TIPO HOME FINAL: $tipoHome");
+                    print("CUESTIONARIO: $cuestionario");
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -167,22 +185,36 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     );
 
-                    // 🔥 SI NO TIENE CUESTIONARIO
-                    if (tipoHome == null || tipoHome.toString().isEmpty) {
-                      Navigator.pushReplacementNamed(context, '/cuestionario');
+                    /// 🔥 SI NO TIENE CUESTIONARIO
+                    if (tipoHome == null ||
+                        tipoHome.toString().isEmpty ||
+                        cuestionario == null) {
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => Cuestionario(
+                            nombre: user['name'] ?? '',
+                            correo: emailCtrl.text.trim(),
+                            telefono: '',
+                            fecha: '',
+                          ),
+                        ),
+                      );
                       return;
                     }
 
-                    // 🔥 NORMALIZAR (importante)
+                    /// 🔥 NORMALIZAR
                     final tipoHomeNormalizado =
                         tipoHome.toString().toLowerCase();
 
-                    // 🔥 REDIRECCIÓN
+                    /// 🔥 REDIRECCIÓN
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (_) => MainNavigation(
                           tipoHome: tipoHomeNormalizado,
+                          user: user,
                         ),
                       ),
                     );

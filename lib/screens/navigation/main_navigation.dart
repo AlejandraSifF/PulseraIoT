@@ -10,9 +10,13 @@ import '../ayuda/centro_ayuda/centro_ayuda_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   final String tipoHome;
+  final Map<String, dynamic> user; // 🔥 NUEVO: Recibimos el usuario completo
 
-  const MainNavigation({super.key, required this.tipoHome});
-
+  const MainNavigation({
+    super.key, 
+    required this.tipoHome, 
+    required this.user
+    });
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }

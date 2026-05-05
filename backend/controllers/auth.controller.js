@@ -119,7 +119,9 @@ const login = async (req, res) => {
     const userResponse = {
       id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      tipoHome: user.tipoHome,
+      cuestionario: user.cuestionario,
     };
 
     res.json({
@@ -150,7 +152,7 @@ const login = async (req, res) => {
             message: 'Usuario no existe',
         });
     }
-
+    
       const token = jwt.sign(
         { id: uid },
         process.env.JWT_SECRET,
@@ -160,7 +162,9 @@ const login = async (req, res) => {
       const userResponse = {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        tipoHome: user.tipoHome,
+        cuestionario: user.cuestionario,
      };
 
       res.json({
@@ -269,8 +273,8 @@ const changeEmail = async (req, res) => {
   }
 };
 
-console.log("BODY:", req.body);
-console.log("UID:", req.uid);
+//console.log("BODY:", req.body);
+//console.log("UID:", req.uid);
 
 module.exports = {
   testUser,
