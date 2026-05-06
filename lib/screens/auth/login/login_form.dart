@@ -163,7 +163,7 @@ class _LoginFormState extends State<LoginForm> {
 
                     await perfilProvider.guardarDatos(
                       nombre: user['name'] ?? '',
-                      edad: cuestionario?['edad'] ?? 0,
+                      //: cuestionario?['edad'] ?? 0,
                       sexo: cuestionario?['sexo'] ?? '',
                       nombreContacto: cuestionario?['contactoEmergenciaNombre'] ?? '',
                       telefonoContacto: cuestionario?['contactoEmergenciaTelefono'] ?? '',

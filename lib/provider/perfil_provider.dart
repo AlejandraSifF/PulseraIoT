@@ -7,7 +7,7 @@ class PerfilProvider extends ChangeNotifier {
   File? imagenPerfil;
 
   String nombre = "";
-  int edad = 0;
+  //int edad = 0;
   String sexo = "";
 
   String telefonoUsuario = ""; 
@@ -49,7 +49,7 @@ class PerfilProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
 
     nombre = prefs.getString("nombre") ?? "";
-    edad = prefs.getInt("edad") ?? 0;
+    //edad = prefs.getInt("edad") ?? 0;
     sexo = prefs.getString("sexo") ?? "";
 
     telefonoUsuario = prefs.getString("telefonoUsuario") ?? "";
@@ -67,7 +67,7 @@ class PerfilProvider extends ChangeNotifier {
 
   Future guardarDatos({
     required String nombre,
-    required int edad,
+    //required int edad,
     required String sexo,
     required String nombreContacto,
     required String telefonoContacto,
@@ -94,7 +94,7 @@ class PerfilProvider extends ChangeNotifier {
         correo.isNotEmpty ? correo : this.correo;
 
     await prefs.setString("nombre", nombre);
-    await prefs.setInt("edad", edad);
+    //await prefs.setInt("edad", edad);
     await prefs.setString("sexo", sexo);
 
     await prefs.setString("telefonoUsuario", telefonoUsuarioFinal);
@@ -108,7 +108,7 @@ class PerfilProvider extends ChangeNotifier {
     await prefs.setString("correo", correoFinal);
 
     this.nombre = nombre;
-    this.edad = edad;
+    //this.edad = edad;
     this.sexo = sexo;
 
     this.telefonoUsuario = telefonoUsuarioFinal;
@@ -116,7 +116,7 @@ class PerfilProvider extends ChangeNotifier {
     this.telefonoContacto = telefonoContactoFinal;
 
     this.fechaNacimiento = fechaFinal;
-    this.tipoPerfil = tipoPerfil;
+    //this.tipoPerfil = tipoPerfil;
 
     this.correo = correoFinal;
     notifyListeners();
@@ -131,7 +131,7 @@ class PerfilProvider extends ChangeNotifier {
 
     // 🔄 Resetear variables
     nombre = "";
-    edad = 0;
+    //edad = 0;
     sexo = "";
 
     telefonoUsuario = "";
@@ -145,4 +145,28 @@ class PerfilProvider extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  int get edadCalculada {
+  if (fechaNacimiento.isEmpty) return 0;
+
+  try {
+    final nacimiento = DateTime.parse(fechaNacimiento);
+    final hoy = DateTime.now();
+
+    int edad = hoy.year - nacimiento.year;
+
+    if (hoy.month < nacimiento.month ||
+        (hoy.month == nacimiento.month &&
+         hoy.day < nacimiento.day)) {
+      edad--;
+    }
+
+    return edad;
+  } catch (e) {
+    return 0;
+  }
+}
+
+  
+
 }

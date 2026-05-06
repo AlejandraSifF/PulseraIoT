@@ -52,7 +52,19 @@ class _EditarPerfilSubpantallaState
         telefonoUsuarioController.text =
             perfil.telefonoUsuario.replaceAll("+52", "");
 
-        fechaController.text = perfil.fechaNacimiento;
+        //fechaController.text = perfil.fechaNacimiento;
+        if (perfil.fechaNacimiento.isNotEmpty) {
+  try {
+    final fecha = DateTime.parse(perfil.fechaNacimiento);
+
+    fechaController.text =
+        "${fecha.day.toString().padLeft(2, '0')}/"
+        "${fecha.month.toString().padLeft(2, '0')}/"
+        "${fecha.year}";
+  } catch (e) {
+    fechaController.text = "";
+  }
+}
 
         nombrereContactoEmergenciaController.text = perfil.nombreContacto;
         telefonoContactoEmergenciaController.text =
@@ -119,10 +131,9 @@ class _EditarPerfilSubpantallaState
 
     if (fechaSeleccionada != null) {
       setState(() {
-        fechaController.text =
-            "${fechaSeleccionada.day.toString().padLeft(2, '0')}/"
-            "${fechaSeleccionada.month.toString().padLeft(2, '0')}/"
-            "${fechaSeleccionada.year}";
+        fechaController.text = "${fechaSeleccionada.day.toString().padLeft(2, '0')}/"
+    "${fechaSeleccionada.month.toString().padLeft(2, '0')}/"
+    "${fechaSeleccionada.year}";
       });
     }
   }
@@ -155,7 +166,7 @@ class _EditarPerfilSubpantallaState
     // ================= GUARDAR LOCAL =================
     await perfilProvider.guardarDatos(
       nombre: nombreUsuarioController.text,
-      edad: perfilProvider.edad,
+      //edad: perfilProvider.edad,
       sexo: perfilProvider.sexo,
       nombreContacto: nombrereContactoEmergenciaController.text,
       telefonoContacto: telefonoEmergenciaCompleto,

@@ -90,7 +90,7 @@ class HomeDiabetes extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "${perfilProvider.edad} años",
+                          "${perfilProvider.edadCalculada} años",
                           style: AppTextStyles.secundario,
                         ),
                       ],

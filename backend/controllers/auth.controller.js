@@ -142,7 +142,7 @@ const guardarCuestionario = async (req, res) => {
     //console.log("BODY:", req.body);// 🔥 DEBUG
     const {
       tipoHome,
-      edad,
+      //edad,
       sexo,
       viveSolo,
       hipertension,
@@ -158,16 +158,16 @@ const guardarCuestionario = async (req, res) => {
     let fechaConvertida = null;
 
     if (fechaNacimiento) {
-      const partes = fechaNacimiento.split('/');
-      fechaConvertida = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+      fechaConvertida = new Date(fechaNacimiento);
     }
 
     const user = await User.findByIdAndUpdate(
       req.uid,
       {
         tipoHome,
+        fechaNacimiento: fechaConvertida,
         cuestionario: {
-          edad,
+          //edad,
           sexo,
           viveSolo,
           hipertension,
@@ -204,8 +204,7 @@ const actualizarPerfil = async (req, res) => {
     let fechaConvertida = null;
 
     if (fechaNacimiento) {
-      const partes = fechaNacimiento.split('/');
-      fechaConvertida = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+      fechaConvertida = new Date(fechaNacimiento);
     }
 
     const user = await User.findByIdAndUpdate(
@@ -213,6 +212,7 @@ const actualizarPerfil = async (req, res) => {
       {
         name,
         telefono,
+        fechaNacimiento: fechaConvertida,
         'cuestionario.contactoEmergenciaNombre': contactoNombre,
         'cuestionario.contactoEmergenciaTelefono': contactoTelefono,
         'cuestionario.fechaNacimiento': fechaConvertida

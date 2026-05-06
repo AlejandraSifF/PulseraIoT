@@ -57,7 +57,7 @@ class AuthService {
   // ================= CUESTIONARIO =================
   static Future<Map<String, dynamic>> guardarCuestionario({
     required String tipoHome,
-    required int edad,
+    //required int edad,
     required String sexo,
     required String viveSolo,
     required bool hipertension,
@@ -79,7 +79,7 @@ class AuthService {
       },
       body: jsonEncode({
         'tipoHome': tipoHome,
-        'edad': edad,
+        // 'edad': edad,
         'sexo': sexo,
         'viveSolo': viveSolo,
         'hipertension': hipertension,

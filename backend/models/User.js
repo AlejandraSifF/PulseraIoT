@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
 
   // 🔥 NUEVO
   tipoHome: { type: String, default: null },
+  fechaNacimiento: { type: Date, default: null },// 🔥 NUEVO
 
   cuestionario: {
     edad: Number,
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
     medicacion: String,
     contactoEmergenciaNombre: String,
     contactoEmergenciaTelefono: String,
-    fechaNacimiento: Date
+    //fechaNacimiento: Date
   }
 });
 

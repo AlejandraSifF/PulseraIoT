@@ -193,8 +193,9 @@ class _RegistroPState extends State<RegistroP> {
                     );
                   }
 
-                  fechaCtrl.text =
-                      "${fecha.day}/${fecha.month}/${fecha.year}";
+                  fechaCtrl.text =  "${fecha.day.toString().padLeft(2, '0')}/" 
+                  "${fecha.month.toString().padLeft(2, '0')}/"
+                  "${fecha.year}";
                 }
               },
             ),

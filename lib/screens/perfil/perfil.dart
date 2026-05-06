@@ -84,7 +84,7 @@ class Perfil extends StatelessWidget {
                               children: [
 
                                 Text(
-                                  "Edad\n${perfilProvider.edad} años",
+                                  "Edad\n${perfilProvider.edadCalculada} años",
                                   style: AppTextStyles.secundario.copyWith(
                                     color: AppColors.textoClaro,
                                   ),

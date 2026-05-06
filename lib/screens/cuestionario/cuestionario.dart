@@ -27,7 +27,7 @@ class Cuestionario extends StatefulWidget {
 
 class _CuestionarioState extends State<Cuestionario> {
 
-  final TextEditingController edadCtrl = TextEditingController();
+  //final TextEditingController edadCtrl = TextEditingController();
   final TextEditingController nombreContactoCtrl = TextEditingController();
   final TextEditingController telefonoContactoCtrl = TextEditingController();
 
@@ -170,7 +170,7 @@ class _CuestionarioState extends State<Cuestionario> {
 
         const SizedBox(height: 15),
 
-        TextField(
+        /*TextField(
           controller: edadCtrl,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -183,7 +183,7 @@ class _CuestionarioState extends State<Cuestionario> {
               borderSide: BorderSide.none,
             ),
           ),
-        ),
+        ),*/
 
         _subtitulo("Sexo:"),
         _radio("Femenino", sexoSeleccionado, (v) => sexoSeleccionado = v),
@@ -331,12 +331,12 @@ class _CuestionarioState extends State<Cuestionario> {
   // ================= VALIDACIONES =================
 
   bool _validarPaso1() {
-    int? edad = int.tryParse(edadCtrl.text);
+    /*int? edad = int.tryParse(edadCtrl.text);
 
     if (edad == null || edad < 65) {
       _mensaje("Edad inválida (65+)");
       return false;
-    }
+    }*/
 
     if (sexoSeleccionado == null) {
       _mensaje("Selecciona el sexo");
@@ -466,7 +466,7 @@ class _CuestionarioState extends State<Cuestionario> {
   // ✅ Guardado local (opcional)
   await perfilProvider.guardarDatos(
     nombre: widget.nombre,
-    edad: int.parse(edadCtrl.text),
+    //edad: int.parse(edadCtrl.text),
     sexo: sexoSeleccionado!,
     nombreContacto: nombreContactoCtrl.text,
     telefonoContacto: telefonoCompleto,
@@ -479,7 +479,7 @@ class _CuestionarioState extends State<Cuestionario> {
     //nombre: widget.nombre,
     //correo: widget.correo,
     tipoHome: tipoHome,
-    edad: int.parse(edadCtrl.text),
+    //edad: int.parse(edadCtrl.text),
     sexo: sexoSeleccionado!,
     viveSolo: viveSolo!,
     hipertension: tieneHipertension,
@@ -502,7 +502,7 @@ class _CuestionarioState extends State<Cuestionario> {
         "email": widget.correo,
         "tipoHome": tipoHome,
         "cuestionario": {
-          "edad": int.parse(edadCtrl.text),
+          //"edad": int.parse(edadCtrl.text),
           "sexo": sexoSeleccionado,
           "viveSolo": viveSolo,
           "hipertension": tieneHipertension,
