@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart'; // 🔥 IMPORT FALTANTE
+import 'package:provider/provider.dart';
+
 import '../../../theme/app_colors.dart';
 import '../../../services/auth_service.dart';
 import '../../navigation/main_navigation.dart';
@@ -21,13 +22,13 @@ class _LoginFormState extends State<LoginForm> {
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
 
+  // ================= GOOGLE =================
   Future<UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser == null) return null;
 
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    final googleAuth = await googleUser.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -35,6 +36,20 @@ class _LoginFormState extends State<LoginForm> {
     );
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
+  // ================= FORMATEAR FECHA =================
+  String _formatearFecha(dynamic fecha) {
+    if (fecha == null) return "";
+
+    try {
+      final date = DateTime.parse(fecha);
+      return "${date.day.toString().padLeft(2, '0')}/"
+          "${date.month.toString().padLeft(2, '0')}/"
+          "${date.year}";
+    } catch (e) {
+      return "";
+    }
   }
 
   @override
@@ -48,7 +63,6 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.fondoBlanco,
-
       appBar: AppBar(
         backgroundColor: AppColors.fondoBlanco,
         elevation: 0,
@@ -60,7 +74,6 @@ class _LoginFormState extends State<LoginForm> {
           color: AppColors.colorBotonPrincipal,
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -76,18 +89,9 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            const SizedBox(height: 8),
-
-            const Text(
-              "Ingresa tu correo y contraseña para continuar",
-              style: TextStyle(color: AppColors.textoSecundario),
-            ),
-
             const SizedBox(height: 25),
 
             const Text("Correo"),
-            const SizedBox(height: 5),
-
             TextField(
               controller: emailCtrl,
               decoration: InputDecoration(
@@ -104,8 +108,6 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 20),
 
             const Text("Contraseña"),
-            const SizedBox(height: 5),
-
             TextField(
               controller: passCtrl,
               obscureText: ocultarPassword,
@@ -133,7 +135,7 @@ class _LoginFormState extends State<LoginForm> {
 
             const SizedBox(height: 30),
 
-            /// 🔥 LOGIN
+            /// ================= LOGIN =================
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -151,32 +153,26 @@ class _LoginFormState extends State<LoginForm> {
                     password: passCtrl.text.trim(),
                   );
 
-                  print("RESPONSE: $response");
-
                   if (response['ok']) {
 
-                    // 🔥 PROVIDER BIEN USADO
-                    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+                    final perfilProvider =
+                        Provider.of<PerfilProvider>(context, listen: false);
 
                     final user = response['user'];
                     final cuestionario = user['cuestionario'];
 
-                    // 🔥 GUARDAR DATOS CORRECTAMENTE
                     await perfilProvider.guardarDatos(
                       nombre: user['name'] ?? '',
                       edad: cuestionario?['edad'] ?? 0,
                       sexo: cuestionario?['sexo'] ?? '',
-                      nombreContacto: cuestionario?['contactoNombre'] ?? '',
-                      telefonoContacto: cuestionario?['contactoTelefono'] ?? '',
-                      telefonoUsuario: '',
-                      fechaNacimiento: '',
+                      nombreContacto: cuestionario?['contactoEmergenciaNombre'] ?? '',
+                      telefonoContacto: cuestionario?['contactoEmergenciaTelefono'] ?? '',
+                      telefonoUsuario: user['telefono'] ?? '', // 🔥 FIX
+                      fechaNacimiento: _formatearFecha(cuestionario?['fechaNacimiento']),
                       correo: user['email'] ?? '',
                     );
 
                     final tipoHome = user['tipoHome'];
-
-                    print("TIPO HOME FINAL: $tipoHome");
-                    print("CUESTIONARIO: $cuestionario");
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -185,7 +181,7 @@ class _LoginFormState extends State<LoginForm> {
                       ),
                     );
 
-                    /// 🔥 SI NO TIENE CUESTIONARIO
+                    /// SI NO TIENE CUESTIONARIO
                     if (tipoHome == null ||
                         tipoHome.toString().isEmpty ||
                         cuestionario == null) {
@@ -196,7 +192,7 @@ class _LoginFormState extends State<LoginForm> {
                           builder: (_) => Cuestionario(
                             nombre: user['name'] ?? '',
                             correo: emailCtrl.text.trim(),
-                            telefono: '',
+                            telefono: user['telefono'] ?? '',
                             fecha: '',
                           ),
                         ),
@@ -204,16 +200,12 @@ class _LoginFormState extends State<LoginForm> {
                       return;
                     }
 
-                    /// 🔥 NORMALIZAR
-                    final tipoHomeNormalizado =
-                        tipoHome.toString().toLowerCase();
-
-                    /// 🔥 REDIRECCIÓN
+                    /// REDIRECCIÓN NORMAL
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (_) => MainNavigation(
-                          tipoHome: tipoHomeNormalizado,
+                          tipoHome: tipoHome.toString().toLowerCase(),
                           user: user,
                         ),
                       ),
@@ -235,38 +227,6 @@ class _LoginFormState extends State<LoginForm> {
                     color: AppColors.textoClaro,
                   ),
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            /// GOOGLE
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.login, color: AppColors.textoClaro),
-                label: const Text(
-                  "Continuar con Google",
-                  style: TextStyle(color: AppColors.textoClaro),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.botonGoogle,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                onPressed: () async {
-                  final user = await signInWithGoogle();
-
-                  if (user != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Login con Google exitoso"),
-                      ),
-                    );
-                  }
-                },
               ),
             ),
           ],

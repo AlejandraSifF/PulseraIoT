@@ -184,6 +184,7 @@ class _RegistroCState extends State<RegistroC> {
                             name: widget.nombre,
                             email: widget.correo,
                             password: passCtrl.text,
+                            telefono: widget.telefono,
                           );
 
                           if (response['ok']) {

@@ -2,44 +2,28 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Usuario de prueba
+// ================= TEST USER =================
 const testUser = async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash('123456', salt);
 
     const user = await User.create({
-      name: 'Prueba3',
-      email: 'prueba@test3.com',
+      name: 'Prueba',
+      email: 'test@test.com',
       password: hashedPassword,
     });
 
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email
-    };
-
-    res.json({ ok: true, user: userResponse });
+    res.json({ ok: true, user });
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: 'Error interno del servidor'
-    });
+    res.status(500).json({ ok: false });
   }
 };
 
-// Registro
+// ================= REGISTER =================
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Todos los campos son obligatorios',
-      });
-    }
+    const { name, email, password, telefono } = req.body;
 
     const exists = await User.findOne({ email });
     if (exists) {
@@ -56,45 +40,24 @@ const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      telefono : telefono || '' // Aseguramos que siempre tenga un valor, aunque sea vacío
     });
 
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email
-    };
-
-    res.status(201).json({
-      ok: true,
-      message: 'Usuario creado correctamente',
-      user: userResponse,
-    });
+    res.json({ ok: true, user });
 
   } catch (error) {
-    console.log('Error en register:', error);
-    res.status(500).json({
-      ok: false,
-      message: 'Error interno del servidor',
-      message: error.message
-    });
+    console.log(error);
+    res.status(500).json({ ok: false });
   }
 };
 
-// Login
+// ================= LOGIN =================
 const login = async (req, res) => {
-//console.log('METHOD:', req.method);
-//console.log('BODY:', req.body);
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Email y contraseña obligatorios',
-      });
-    }
-
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({
         ok: false,
@@ -102,8 +65,9 @@ const login = async (req, res) => {
       });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
+    const valid = await bcrypt.compare(password, user.password);
+
+    if (!valid) {
       return res.status(400).json({
         ok: false,
         message: 'Contraseña incorrecta',
@@ -116,166 +80,154 @@ const login = async (req, res) => {
       { expiresIn: '2h' }
     );
 
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      tipoHome: user.tipoHome,
-      cuestionario: user.cuestionario,
-    };
-
     res.json({
       ok: true,
-      message: 'Login exitoso',
-      user: userResponse,
       token,
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: 'Error interno del servidor'
-    });
-  }
-};
-
-// Renew token
-    const renew = async (req, res) => {
-      try {
-        const uid = req.uid;
-
-        const user = await User.findById(uid).select('-password');
-
-        if (!user) {
-           return res.status(404).json({
-            ok: false,
-            message: 'Usuario no existe',
-        });
-    }
-    
-      const token = jwt.sign(
-        { id: uid },
-        process.env.JWT_SECRET,
-        { expiresIn: '2h' }
-     );
-
-      const userResponse = {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        tipoHome: user.tipoHome,
-        cuestionario: user.cuestionario,
-     };
-
-      res.json({
-        ok: true,
-         message: 'Token renovado correctamente',
-         user: userResponse,
-         token,
-     });
-
-    } catch (error) {
-      res.status(500).json({
-        ok: false,
-        message: 'Error interno del servidor'
-     });
-    }
-  };
-
-  // Cambiar contraseña
-const changePassword = async (req, res) => {
-  try {
-    const uid = req.uid; // viene del token
-    const { currentPassword, newPassword } = req.body;
-
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Faltan datos',
-      });
-    }
-
-    const user = await User.findById(uid);
-    if (!user) {
-      return res.status(404).json({
-        ok: false,
-        message: 'Usuario no existe',
-      });
-    }
-
-    // Verificar contraseña actual
-    const validPassword = await bcrypt.compare(currentPassword, user.password);
-    if (!validPassword) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Contraseña actual incorrecta',
-      });
-    }
-
-    // Encriptar nueva contraseña
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    user.password = hashedPassword;
-    await user.save();
-
-    res.json({
-      ok: true,
-      message: 'Contraseña actualizada correctamente',
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: 'Error interno del servidor',
-    });
-  }
-};
-
-const changeEmail = async (req, res) => {
-  try {
-    const uid = req.uid;
-    const { newEmail } = req.body;
-
-    if (!newEmail) {
-      return res.status(400).json({
-        ok: false,
-        message: 'Correo requerido'
-      });
-    }
-
-    const existing = await User.findOne({ email: newEmail });
-
-    if (existing) {
-      return res.status(400).json({
-        ok: false,
-        message: 'El correo ya está en uso'
-      });
-    }
-
-    const user = await User.findByIdAndUpdate(
-      uid,
-      { email: newEmail },
-      { new: true }
-    );
-
-    res.json({
-      ok: true,
-      message: 'Correo actualizado',
       user
     });
 
   } catch (error) {
-    res.status(500).json({
-      ok: false,
-      message: 'Error interno'
-    });
+    res.status(500).json({ ok: false });
   }
 };
 
-//console.log("BODY:", req.body);
-//console.log("UID:", req.uid);
+// ================= RENEW =================
+const renew = async (req, res) => {
+  const user = await User.findById(req.uid);
 
+  const token = jwt.sign(
+    { id: req.uid },
+    process.env.JWT_SECRET,
+    { expiresIn: '2h' }
+  );
+
+  res.json({ ok: true, user, token });
+};
+
+// ================= CHANGE PASSWORD =================
+const changePassword = async (req, res) => {
+  const user = await User.findById(req.uid);
+
+  const valid = await bcrypt.compare(
+    req.body.currentPassword,
+    user.password
+  );
+
+  if (!valid) {
+    return res.status(400).json({ ok: false });
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(req.body.newPassword, salt);
+
+  await user.save();
+
+  res.json({ ok: true });
+};
+
+// ================= CHANGE EMAIL =================
+const changeEmail = async (req, res) => {
+  const user = await User.findByIdAndUpdate(
+    req.uid,
+    { email: req.body.newEmail },
+    { new: true }
+  );
+
+  res.json({ ok: true, user });
+};
+
+// ================= 🔥 CUESTIONARIO =================
+const guardarCuestionario = async (req, res) => {
+  try {
+    //console.log("BODY:", req.body);// 🔥 DEBUG
+    const {
+      tipoHome,
+      edad,
+      sexo,
+      viveSolo,
+      hipertension,
+      diabetes,
+      caidas,
+      movilidad,
+      medicacion,
+      contactoEmergenciaNombre,
+      contactoEmergenciaTelefono,
+      fechaNacimiento
+    } = req.body;
+
+    let fechaConvertida = null;
+
+    if (fechaNacimiento) {
+      const partes = fechaNacimiento.split('/');
+      fechaConvertida = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.uid,
+      {
+        tipoHome,
+        cuestionario: {
+          edad,
+          sexo,
+          viveSolo,
+          hipertension,
+          diabetes,
+          caidas,
+          movilidad,
+          medicacion,
+          contactoEmergenciaNombre,
+          contactoEmergenciaTelefono,
+          fechaNacimiento: fechaConvertida
+        }
+      },
+      { new: true }
+    );
+
+    res.json({ ok: true, user });
+
+  } catch (error) {
+    res.status(500).json({ ok: false });
+  }
+};
+
+// ================= 🔥 UPDATE PROFILE =================
+const actualizarPerfil = async (req, res) => {
+  try {
+    const {
+      name,
+      telefono,
+      contactoNombre,
+      contactoTelefono,
+      fechaNacimiento
+    } = req.body;
+
+    let fechaConvertida = null;
+
+    if (fechaNacimiento) {
+      const partes = fechaNacimiento.split('/');
+      fechaConvertida = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.uid,
+      {
+        name,
+        telefono,
+        'cuestionario.contactoEmergenciaNombre': contactoNombre,
+        'cuestionario.contactoEmergenciaTelefono': contactoTelefono,
+        'cuestionario.fechaNacimiento': fechaConvertida
+      },
+      { new: true }
+    );
+
+    res.json({ ok: true, user });
+
+  } catch (error) {
+    res.status(500).json({ ok: false });
+  }
+};
+
+// ================= EXPORT =================
 module.exports = {
   testUser,
   register,
@@ -283,4 +235,6 @@ module.exports = {
   renew,
   changePassword,
   changeEmail,
+  guardarCuestionario,
+  actualizarPerfil
 };

@@ -476,8 +476,8 @@ class _CuestionarioState extends State<Cuestionario> {
 
   // 🔥 NUEVO: GUARDAR EN BACKEND
   final response = await AuthService.guardarCuestionario(
-    nombre: widget.nombre,
-    correo: widget.correo,
+    //nombre: widget.nombre,
+    //correo: widget.correo,
     tipoHome: tipoHome,
     edad: int.parse(edadCtrl.text),
     sexo: sexoSeleccionado!,
@@ -487,8 +487,9 @@ class _CuestionarioState extends State<Cuestionario> {
     caidas: caidasRecientes!,
     movilidad: movilidad!,
     medicacion: medicacion!,
-    contactoNombre: nombreContactoCtrl.text,
-    contactoTelefono: telefonoCompleto,
+    contactoEmergenciaNombre: nombreContactoCtrl.text,
+    contactoEmergenciaTelefono: telefonoCompleto,
+    fechaNacimiento: widget.fecha,
   );
 
   print(response); // 🔍 DEBUG

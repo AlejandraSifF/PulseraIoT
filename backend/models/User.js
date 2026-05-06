@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
+//const { testUser } = require('../controllers/auth.controller');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  telefono: { type: String, default: '' },
 
   // 🔥 NUEVO
   tipoHome: { type: String, default: null },
@@ -17,8 +19,9 @@ const userSchema = new mongoose.Schema({
     caidas: String,
     movilidad: String,
     medicacion: String,
-    contactoNombre: String,
-    contactoTelefono: String,
+    contactoEmergenciaNombre: String,
+    contactoEmergenciaTelefono: String,
+    fechaNacimiento: Date
   }
 });
 

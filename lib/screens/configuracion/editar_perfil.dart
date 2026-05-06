@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../provider/perfil_provider.dart';
+import '../../services/auth_service.dart';
 
 class EditarPerfilSubpantalla extends StatefulWidget {
   const EditarPerfilSubpantalla({super.key});
@@ -27,7 +28,6 @@ class _EditarPerfilSubpantallaState
   final TextEditingController nombrereContactoEmergenciaController = TextEditingController();
   final TextEditingController telefonoContactoEmergenciaController = TextEditingController();
 
-  /// 🔥 CÓDIGOS SEPARADOS
   String codigoUsuario = "+52";
   String codigoEmergencia = "+52";
   String codigoPais = "MX";
@@ -48,15 +48,12 @@ class _EditarPerfilSubpantallaState
       if (!mounted) return;
 
       setState(() {
-        /// 👤 USUARIO
         nombreUsuarioController.text = perfil.nombre;
         telefonoUsuarioController.text =
             perfil.telefonoUsuario.replaceAll("+52", "");
 
-        /// 🎂 FECHA
         fechaController.text = perfil.fechaNacimiento;
 
-        /// 🚨 CONTACTO EMERGENCIA
         nombrereContactoEmergenciaController.text = perfil.nombreContacto;
         telefonoContactoEmergenciaController.text =
             perfil.telefonoContacto.replaceAll("+52", "");
@@ -155,6 +152,7 @@ class _EditarPerfilSubpantallaState
     final perfilProvider =
         Provider.of<PerfilProvider>(context, listen: false);
 
+    // ================= GUARDAR LOCAL =================
     await perfilProvider.guardarDatos(
       nombre: nombreUsuarioController.text,
       edad: perfilProvider.edad,
@@ -165,6 +163,21 @@ class _EditarPerfilSubpantallaState
       fechaNacimiento: fechaController.text,
     );
 
+    // ================= 🔥 GUARDAR EN BACKEND (CORRECTO) =================
+    final response = await AuthService.actualizarPerfil(
+      name: nombreUsuarioController.text,
+      telefono: telefonoUsuarioCompleto,
+      contactoNombre: nombrereContactoEmergenciaController.text,
+      contactoTelefono: telefonoEmergenciaCompleto,
+      fechaNacimiento: fechaController.text,
+    );
+
+    if (!response['ok']) {
+      _mostrarError(response['message'] ?? "Error al guardar en servidor");
+      return;
+    }
+
+    // ================= IMAGEN =================
     if (_imagenSeleccionada != null) {
       await perfilProvider.guardarImagen(_imagenSeleccionada!.path);
     }
@@ -251,7 +264,6 @@ class _EditarPerfilSubpantallaState
 
               const SizedBox(height: 40),
 
-              /// 👤 USUARIO
               _titulo("Nombre completo"),
               TextFormField(
                 controller: nombreUsuarioController,
@@ -272,7 +284,6 @@ class _EditarPerfilSubpantallaState
 
               const SizedBox(height: 25),
 
-              /// 🚨 CONTACTO EMERGENCIA
               _titulo("Nombre contacto de emergencia"),
               TextFormField(
                 controller: nombrereContactoEmergenciaController,
@@ -293,7 +304,6 @@ class _EditarPerfilSubpantallaState
 
               const SizedBox(height: 25),
 
-              /// 🎂 FECHA
               _titulo("Fecha de nacimiento"),
               GestureDetector(
                 onTap: _seleccionarFecha,
