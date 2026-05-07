@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../provider/perfil_provider.dart';
 import '../../widgets/buscador/buscador.dart';
 import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 import '../../services/vitals_service.dart';
 import '../../models/vitals_model.dart';
@@ -153,6 +154,19 @@ class _HomeSanoState extends State<HomeSano> {
                             "${perfilProvider.edadCalculada} años",
                           ),
                         ],
+                      ),
+                    ),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.iconoSuave,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        "Perfil Sano",
+                        style: AppTextStyles.pequeno,
                       ),
                     ),
                   ],

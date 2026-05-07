@@ -168,7 +168,7 @@ class _LoginFormState extends State<LoginForm> {
                       nombreContacto: cuestionario?['contactoEmergenciaNombre'] ?? '',
                       telefonoContacto: cuestionario?['contactoEmergenciaTelefono'] ?? '',
                       telefonoUsuario: user['telefono'] ?? '', // 🔥 FIX
-                      fechaNacimiento: _formatearFecha(cuestionario?['fechaNacimiento']),
+                      fechaNacimiento: _formatearFecha(user?['fechaNacimiento']),
                       correo: user['email'] ?? '',
                     );
 
