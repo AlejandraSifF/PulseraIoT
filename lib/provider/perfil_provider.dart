@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class PerfilProvider extends ChangeNotifier {
 
@@ -150,8 +151,11 @@ class PerfilProvider extends ChangeNotifier {
   if (fechaNacimiento.isEmpty) return 0;
 
   try {
-    final nacimiento = DateTime.parse(fechaNacimiento);
+    final nacimiento = 
+      DateFormat('dd/MM/yyyy').parse(fechaNacimiento);
+
     final hoy = DateTime.now();
+
 
     int edad = hoy.year - nacimiento.year;
 

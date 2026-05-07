@@ -8,6 +8,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../../provider/perfil_provider.dart';
 import '../../services/auth_service.dart';
+import 'package:intl/intl.dart';
 
 class EditarPerfilSubpantalla extends StatefulWidget {
   const EditarPerfilSubpantalla({super.key});
@@ -55,12 +56,12 @@ class _EditarPerfilSubpantallaState
         //fechaController.text = perfil.fechaNacimiento;
         if (perfil.fechaNacimiento.isNotEmpty) {
   try {
-    final fecha = DateTime.parse(perfil.fechaNacimiento);
+    final fecha = DateFormat('dd/MM/yyyy').parse(perfil.fechaNacimiento);
 
-    fechaController.text =
+    fechaController.text = 
         "${fecha.day.toString().padLeft(2, '0')}/"
         "${fecha.month.toString().padLeft(2, '0')}/"
-        "${fecha.year}";
+        "${fecha.year}";// Muestra la fecha en formato original
   } catch (e) {
     fechaController.text = "";
   }

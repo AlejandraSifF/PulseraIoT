@@ -208,8 +208,18 @@ class _CuestionarioState extends State<Cuestionario> {
 
         CheckboxListTile(
           activeColor: AppColors.colorBotonPrincipal,
+          // 👇 color del cuadrito deshabilitado
+          side: BorderSide(
+            color: tieneNinguna
+                ? Colors.grey
+                : Colors.black,
+          ),
+
+          checkColor: AppColors.textoClaro,
+
           title: const Text("Hipertensión arterial",
               style: AppTextStyles.option),
+          
           value: tieneHipertension,
           onChanged: (v) => setState(() {
             tieneHipertension = v!;
@@ -219,6 +229,12 @@ class _CuestionarioState extends State<Cuestionario> {
 
         CheckboxListTile(
           activeColor: AppColors.colorBotonPrincipal,
+            side: BorderSide(
+              color: tieneNinguna
+                  ? Colors.grey
+                  : Colors.black,
+            ),
+
           title: const Text("Diabetes", style: AppTextStyles.option),
           value: tieneDiabetes,
           onChanged: (v) => setState(() {
@@ -229,17 +245,22 @@ class _CuestionarioState extends State<Cuestionario> {
 
         CheckboxListTile(
           activeColor: AppColors.colorBotonPrincipal,
+            side: BorderSide(
+              color: (tieneHipertension || tieneDiabetes)
+                  ? Colors.grey
+                  : Colors.black,
+            ),
           title: const Text("Ninguna", style: AppTextStyles.option),
           value: tieneNinguna,
-          onChanged: (tieneHipertension || tieneDiabetes)
-              ? null
-              : (v) => setState(() {
-                    tieneNinguna = v!;
-                    if (v) {
-                      tieneHipertension = false;
-                      tieneDiabetes = false;
-                    }
-                  }),
+          onChanged: (v) => setState(() {
+            tieneNinguna = v!;
+
+            if (v) {
+              // Si selecciona "Ninguna", desmarcar las otras opciones
+              tieneHipertension = false;
+              tieneDiabetes = false;
+            }
+          }),
         ),
       ],
     );
