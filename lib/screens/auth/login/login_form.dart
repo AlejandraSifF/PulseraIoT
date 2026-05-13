@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../../../theme/app_colors.dart';
 import '../../../services/auth_service.dart';
 import '../../navigation/main_navigation.dart';
@@ -21,6 +22,33 @@ class _LoginFormState extends State<LoginForm> {
 
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
+  //================== coneccion ESP32 enviar email=======
+    Future<void> enviarCorreoAPython(String email) async {
+
+    try {
+
+      final response = await http.post(
+
+        Uri.parse("http://192.168.1.223:5000/loginUser"),//192.168.1.223:5000
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: jsonEncode({
+          "email": email
+        }),
+      );
+
+      print("Respuesta Python:");
+      print(response.body);
+
+    } catch (e) {
+
+      print("Error enviando correo:");
+      print(e);
+    }
+  }
 
   // ================= GOOGLE =================
   Future<UserCredential?> signInWithGoogle() async {
@@ -154,11 +182,17 @@ class _LoginFormState extends State<LoginForm> {
                   );
 
                   if (response['ok']) {
+                    
+                    final user = response['user'];
+                    
+                    await enviarCorreoAPython(
+                      user['email'],
+                    );
 
                     final perfilProvider =
                         Provider.of<PerfilProvider>(context, listen: false);
 
-                    final user = response['user'];
+                    //final user = response['user'];
                     final cuestionario = user['cuestionario'];
 
                     await perfilProvider.guardarDatos(
