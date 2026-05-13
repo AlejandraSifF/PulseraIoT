@@ -22,7 +22,8 @@ ESP32_IP = "192.168.1.241"
 # =========================
 # LOOP PRINCIPAL
 # =========================
-
+ultimo_nombre = None
+ultimo_perfil = None
 while True:
 
     try:
@@ -30,11 +31,11 @@ while True:
         #usuario = coleccion.find_one({"name": "lesly"})
         usuarios = coleccion.find()
 
-        for u in usuarios:
-                print(u["name"])
+        #for u in usuarios:
+         #       print(u["name"])
         
 
-        usuario = coleccion.find_one({"name": "mayor"})
+        usuario = coleccion.find_one({"name": "Lesly"})
 
         if usuario:
 
@@ -51,11 +52,23 @@ while True:
                 "tipoHome": tipo_home
             }
 
-            r = requests.post(
-                url,
-                json=datos,
-                timeout=5
-            )
+            if nombre != ultimo_nombre or tipo_home != ultimo_perfil:
+
+                print("Enviando nueva configuración...")
+
+                r = requests.post(
+                    url,
+                    json=datos,
+                    timeout=5
+                )
+
+                print("Respuesta ESP32:", r.text)
+
+                ultimo_nombre = nombre
+                ultimo_perfil = tipo_home
+
+            else:
+                print("Sin cambios")
 
             print("Respuesta ESP32:", r.text)
 
