@@ -608,20 +608,26 @@ def start_server(ip):
 
     addr = socket.getaddrinfo(ip, 80)[0][-1]
     s = socket.socket()
-    s.bind(addr); s.listen(1); s.settimeout(0.1)
+    s.bind(addr); s.listen(1); s.settimeout(1)
     print("Servidor escuchando en http://{}:80".format(ip))
     
     #-----------------------------------
       
     #-----------------------------------------------
     oled_display = VitalsDisplay()
-
+    
+    import gc
 
     while True:
         update_vitals()
+        
+        gc.collect()
+        
+        time.sleep_ms(3)
 
         try:
             cl, addr = s.accept()
+            
         except OSError:
             continue
 
@@ -658,18 +664,21 @@ def start_server(ip):
 
                     respuesta = "CONFIG OK"
 
-                    cl.send(
+                    cl.sendall(
                         "HTTP/1.1 200 OK\r\n"
                         "Content-Type: text/plain\r\n"
                         "Access-Control-Allow-Origin: *\r\n"
                         "\r\n" + respuesta
                     )
+                    
+                    
+                    continue
 
                 except Exception as e:
 
                     print("Error config:", e)
 
-                    cl.send(
+                    cl.sendall(
                         "HTTP/1.1 500 ERROR\r\n"
                         "Content-Type: text/plain\r\n"
                         "\r\nERROR"
@@ -701,7 +710,7 @@ def start_server(ip):
 
 
             else:
-                cl.send("HTTP/1.1 404 Not Found\r\n"
+                cl.sendall("HTTP/1.1 404 Not Found\r\n"
                         "Access-Control-Allow-Origin: *\r\n"
                         "\r\n")
         finally:
