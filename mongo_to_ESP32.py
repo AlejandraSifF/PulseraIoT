@@ -1,9 +1,15 @@
+from flask import Flask, request, jsonify
 from pymongo import MongoClient
 import requests
-import time
 
 # =========================
-# CONFIGURACIÓN MONGODB
+# FLASK
+# =========================
+
+app = Flask(__name__)
+
+# =========================
+# MONGODB
 # =========================
 
 MONGO_URI = "mongodb://127.0.0.1:27017/"
@@ -14,73 +20,87 @@ db = client["np_app"]
 coleccion = db["users"]
 
 # =========================
-# CONFIG ESP32
-# =========================http://192.168.1.241:80
+# ESP32
+# =========================
 
 ESP32_IP = "192.168.1.241"
 
 # =========================
-# LOOP PRINCIPAL
+# RUTA LOGIN
 # =========================
-ultimo_nombre = None
-ultimo_perfil = None
-while True:
+
+@app.route("/loginUser", methods=["POST"])
+def login_user():
 
     try:
-        #usuario = coleccion.find_one() #encuentra el primero
-        #usuario = coleccion.find_one({"name": "lesly"})
-        usuarios = coleccion.find()
 
-        #for u in usuarios:
-         #       print(u["name"])
-        
+        data = request.json
 
-        usuario = coleccion.find_one({"name": "Lesly"})
+        email = data.get("email")
 
-        if usuario:
+        print("Email recibido:", email)
 
-            nombre = usuario.get("name", "SinNombre")
-            tipo_home = usuario.get("tipoHome", "sano")
+        # Buscar usuario
+        usuario = coleccion.find_one({
+            "email": email
+        })
 
-            print("Nombre:", nombre)
-            print("Perfil:", tipo_home)
+        if not usuario:
+            return jsonify({
+                "ok": False,
+                "message": "Usuario no encontrado"
+            }), 404
 
-            url = f"http://{ESP32_IP}/config"
+        # Datos usuario
+        nombre = usuario.get("name", "SinNombre")
+        tipo_home = usuario.get("tipoHome", "sano")
 
-            datos = {
-                "name": nombre,
-                "tipoHome": tipo_home
-            }
+        print("Nombre:", nombre)
+        print("Perfil:", tipo_home)
 
-            if nombre != ultimo_nombre or tipo_home != ultimo_perfil:
+        # =========================
+        # ENVIAR AL ESP32
+        # =========================
 
-                print("Enviando nueva configuración...")
+        url = f"http://{ESP32_IP}/config"
 
-                r = requests.post(
-                    url,
-                    json=datos,
-                    timeout=5
-                )
+        datos_esp32 = {
+            "name": nombre,
+            "tipoHome": tipo_home
+        }
 
-                print("Respuesta ESP32:", r.text)
+        r = requests.post(
+            url,
+            json=datos_esp32,
+            timeout=5
+        )
 
-                ultimo_nombre = nombre
-                ultimo_perfil = tipo_home
+        print("Respuesta ESP32:", r.text)
 
-            else:
-                print("Sin cambios")
-
-            print("Respuesta ESP32:", r.text)
-
-        else:
-            print("No hay usuarios en MongoDB")
-
-        time.sleep(10)
-
-    except requests.exceptions.RequestException as e:
-        print("Error conexión ESP32:", e)
-        time.sleep(5)
+        return jsonify({
+            "ok": True,
+            "nombre": nombre,
+            "tipoHome": tipo_home,
+            "respuestaESP32": r.text
+        })
 
     except Exception as e:
-        print("Error general:", e)
-        time.sleep(5)
+
+        print("Error:", e)
+
+        return jsonify({
+            "ok": False,
+            "error": str(e)
+        }), 500
+
+# =========================
+# MAIN
+# =========================
+
+if __name__ == "__main__":
+
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
