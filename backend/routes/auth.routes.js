@@ -4,13 +4,16 @@ const authJWT = require('../middleware/authJWT');
 
 const {
   register,
+  registerGoogle,
   login,
+  loginGoogle,
   testUser,
   renew,
   changePassword,
   changeEmail,
   guardarCuestionario,
-  actualizarPerfil
+  actualizarPerfil,
+  setPassword
 } = require('../controllers/auth.controller');
 
 // ================== RUTAS ==================
@@ -29,6 +32,9 @@ router.post('/test-user', testUser);
 router.get('/renew', authJWT, renew);
 router.put('/change-password', authJWT, changePassword);
 router.put('/change-email', authJWT, changeEmail);
+router.post('/login-google', loginGoogle);
+router.post('/register-google', registerGoogle);
+router.post('/set-password', authJWT, setPassword);
 
 // 🔥 YA NO HAY LÓGICA AQUÍ
 router.post('/cuestionario', authJWT, guardarCuestionario);

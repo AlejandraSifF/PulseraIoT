@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-
+import '../services/auth_service.dart';
 class PerfilProvider extends ChangeNotifier {
 
   File? imagenPerfil;
@@ -75,6 +75,7 @@ class PerfilProvider extends ChangeNotifier {
     String telefonoUsuario = "",
     String fechaNacimiento = "",
     String correo = "",
+    String tipoPerfil = "",
   }) async {
 
     final prefs = await SharedPreferences.getInstance();
@@ -129,6 +130,7 @@ class PerfilProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.clear(); // 🔥 BORRA TODO
+    AuthService.token = null; // 🔐 Limpiar token estático
 
     // 🔄 Resetear variables
     nombre = "";

@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:prueba/screens/auth/google/completar_perfil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'registro_c.dart';
-import 'package:prueba/screens/cuestionario/cuestionario.dart';
+//import 'package:prueba/screens/cuestionario/cuestionario.dart';
 import '../../ayuda/centro_ayuda/terminos_condiciones.dart';
 import '../../ayuda/centro_ayuda/politica_de_privacidad.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../services/auth_service.dart';
 //import '../../../services/auth_service.dart';
+//import '../google/completar_perfil.dart';
 
 class RegistroP extends StatefulWidget {
   const RegistroP({super.key});
@@ -48,8 +51,15 @@ class _RegistroPState extends State<RegistroP> {
     return edad;
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  /*Future<UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    
+    // cerrar sesión previa para evitar conflictos
+    await GoogleSignIn().signOut();
+
+    //preguntar al usuario que cuenta usar para iniciar sesión
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
     if (googleUser == null) return null;
 
     final googleAuth = await googleUser.authentication;
@@ -60,7 +70,38 @@ class _RegistroPState extends State<RegistroP> {
     );
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
+  } catch (e) {
+    print("Error en inicio de sesión con Google: $e");
+    return null;
+  }*/
+
+  Future<UserCredential?> signInWithGoogle() async {
+  try {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+
+    // 🔥 cerrar sesión primero
+    await googleSignIn.signOut();
+
+    // 🔥 pedir cuenta
+    final GoogleSignInAccount? googleUser =
+        await googleSignIn.signIn();
+
+    if (googleUser == null) return null;
+
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+
+  } catch (e) {
+    print("Error en inicio de sesión con Google: $e");
+    return null;
   }
+}
 
   bool _isValidEmail(String email) {
     final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -333,20 +374,52 @@ class _RegistroPState extends State<RegistroP> {
                           userCredential.user?.email ?? "",
                         );
 
-                        Navigator.pushReplacement(
+                        /*Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => Cuestionario(
-                              nombre:
-                                  userCredential.user?.displayName ?? '',
-                              correo:
-                                  userCredential.user?.email ?? '',
-                              telefono: "",
-                              fecha: "",
+                            builder: (_) => CompletarPerfil(
+                              nombre: userCredential.user?.displayName ?? '',
+                              correo: userCredential.user?.email ?? '',
                             ),
                           ),
-                        );
+                        );*/
+
+                        final user = userCredential.user!;
+final email = user.email ?? '';
+final nombre = user.displayName ?? '';
+
+// 🔥 llamar a tu backend
+final result = await AuthService.registerGoogle(
+  name: nombre,
+  email: email,
+  telefono: telefonoCompleto,
+  fechaNacimiento: fechaCtrl.text,
+);
+
+// 🔴 SI YA EXISTE
+if (result['yaRegistrado'] == true) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Cuenta existente, inicia sesión"),
+      backgroundColor: Colors.orange,
+    ),
+  );
+
+  return;
+}
+
+// 🟢 SI ES NUEVO
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (_) => CompletarPerfil(
+      nombre: nombre,
+      correo: email,
+    ),
+  ),
+);
                       }
+
                     },
                     icon: const Icon(Icons.g_mobiledata),
                   ),

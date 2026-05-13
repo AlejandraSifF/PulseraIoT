@@ -9,7 +9,7 @@ const testUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash('123456', salt);
 
     const user = await User.create({
-      name: 'Prueba',
+      name: 'Prueba33',
       email: 'test@test.com',
       password: hashedPassword,
     });
@@ -48,6 +48,139 @@ const register = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ ok: false });
+  }
+};
+
+// ================= GOOGLE REGISTER =================
+const registerGoogle = async (req, res) => {
+  try {
+
+    const {
+      name,
+      email,
+      telefono,
+      fechaNacimiento
+    } = req.body;
+
+    // 🔥 Convertir fecha dd/MM/yyyy → Date
+    let fechaConvertida = null;
+
+    if (fechaNacimiento) {
+
+      const partes = fechaNacimiento.split('/');
+
+      if (partes.length === 3) {
+        fechaConvertida = new Date(
+          partes[2], // año
+          partes[1] - 1, // mes
+          partes[0] // día
+        );
+      }
+    }
+
+    // 🔥 Verificar si ya existe
+    const exists = await User.findOne({ email });
+
+    // ❌ SI YA EXISTE → NO REGISTRAR
+    /*if (exists) {
+      return res.status(400).json({
+        ok: false,
+        yaRegistrado: true,
+        message: 'Esta cuenta ya está registrada'
+      });
+    }*/
+   if (exists) {
+
+  exists.telefono = telefono || exists.telefono;
+
+  exists.fechaNacimiento = fechaConvertida || exists.fechaNacimiento;
+
+  await exists.save();
+
+  const token = jwt.sign(
+    { id: exists._id },
+    process.env.JWT_SECRET,
+    { expiresIn: '2h' }
+  );
+
+  return res.status(200).json({
+    ok: true,
+    user: exists,
+    token,
+    completado: true
+  });
+}
+
+    // ✅ Crear usuario nuevo Google
+    const user = await User.create({
+      name,
+      email,
+      password: 'GOOGLE_LOGIN',
+      telefono: telefono || '',
+      fechaNacimiento: fechaConvertida
+    });
+
+    // 🔥 Generar token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    res.status(201).json({
+      ok: true,
+      message: 'Usuario creado',
+      user,
+      token
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      ok: false,
+      message: 'Error en registro Google'
+    });
+  }
+};
+
+// ================= GOOGLE LOGIN =================
+const loginGoogle = async (req, res) => {
+  try {
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    // Crear token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    res.json({
+      ok: true,
+      user,
+      token
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      ok: false,
+      message: 'Error login Google'
+    });
   }
 };
 
@@ -139,6 +272,8 @@ const changeEmail = async (req, res) => {
 // ================= 🔥 CUESTIONARIO =================
 const guardarCuestionario = async (req, res) => {
   try {
+    //console.log("UID:", req.uid);
+    //console.log("BODY:", req.body);
     //console.log("BODY:", req.body);// 🔥 DEBUG
     const {
       tipoHome,
@@ -158,7 +293,15 @@ const guardarCuestionario = async (req, res) => {
     let fechaConvertida = null;
 
     if (fechaNacimiento) {
-      fechaConvertida = new Date(fechaNacimiento);
+      const partes = fechaNacimiento.split('/');
+
+      if (partes.length === 3) {
+        fechaConvertida = new Date(
+          partes[2], // año
+          partes[1] - 1, // mes
+          partes[0] // día
+        );
+      }
     }
 
     const user = await User.findByIdAndUpdate(
@@ -227,14 +370,33 @@ const actualizarPerfil = async (req, res) => {
   }
 };
 
+// ================= 🔥 SET NEW PASSWORD (SIN CONTRASEÑA ACTUAL) =================
+const setPassword = async (req, res) => {
+  const { newPassword } = req.body;
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  const user = await User.findByIdAndUpdate(
+    req.uid,
+    { password: hashedPassword },
+    { new: true }
+  );
+
+  res.json({ ok: true, user });
+};
+
 // ================= EXPORT =================
 module.exports = {
   testUser,
   register,
+  registerGoogle,
   login,
+  loginGoogle,
   renew,
   changePassword,
   changeEmail,
   guardarCuestionario,
-  actualizarPerfil
+  actualizarPerfil,
+  setPassword
 };
