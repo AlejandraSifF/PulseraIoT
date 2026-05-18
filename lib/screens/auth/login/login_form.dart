@@ -1,14 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
-//<<<<<<< HEAD
-import 'dart:convert';
 import 'package:http/http.dart' as http;
-//=======
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-//>>>>>>> fd6eaf1aaa53411a09449869d948d6adf9d18d0d
 import '../../../theme/app_colors.dart';
 import '../../../services/auth_service.dart';
 import '../../navigation/main_navigation.dart';
@@ -28,31 +26,35 @@ class _LoginFormState extends State<LoginForm> {
 
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
-  //================== coneccion ESP32 enviar email=======
-    Future<void> enviarCorreoAPython(String email) async {
+
+  // ================= ESP32 / PYTHON =================
+  Future<void> enviarCorreoAPython(String email) async {
 
     try {
 
       final response = await http.post(
 
-        Uri.parse("http://192.168.1.223:5000/loginUser"),//192.168.1.223:5000
+        Uri.parse(
+          "http://192.168.1.223:5000/loginUser",
+        ),
 
         headers: {
           "Content-Type": "application/json",
         },
 
         body: jsonEncode({
-          "email": email
+          "email": email,
         }),
       );
 
-      //print("Respuesta Python:");
-      //print(response.body);
+      debugPrint("Respuesta Python:");
+      debugPrint(response.body);
 
     } catch (e) {
 
-      //print("Error enviando correo:");
-      //print(e);
+      debugPrint(
+        "Error enviando correo: $e",
+      );
     }
   }
 
@@ -61,7 +63,8 @@ class _LoginFormState extends State<LoginForm> {
 
     try {
 
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignIn googleSignIn =
+          GoogleSignIn();
 
       await googleSignIn.signOut();
 
@@ -75,12 +78,16 @@ class _LoginFormState extends State<LoginForm> {
 
       final credential =
           GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+        accessToken:
+            googleAuth.accessToken,
+        idToken:
+            googleAuth.idToken,
       );
 
       return await FirebaseAuth.instance
-          .signInWithCredential(credential);
+          .signInWithCredential(
+        credential,
+      );
 
     } catch (e) {
 
@@ -95,28 +102,61 @@ class _LoginFormState extends State<LoginForm> {
   // ================= LOGIN NORMAL =================
   Future<void> loginNormal() async {
 
-    final response = await AuthService.login(
-      email: emailCtrl.text.trim(),
-      password: passCtrl.text.trim(),
-    );
+    try {
 
-    if (!response['ok']) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            response['message'] ?? "Error",
-          ),
-          backgroundColor: Colors.red,
-        ),
+      final response =
+          await AuthService.login(
+        email:
+            emailCtrl.text.trim(),
+        password:
+            passCtrl.text.trim(),
       );
 
-      return;
-    }
+      if (!response['ok']) {
 
-    await procesarLogin(
-      response['user'],
-    );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          SnackBar(
+            content: Text(
+              response['message'] ??
+                  "Error",
+            ),
+            backgroundColor:
+                Colors.red,
+          ),
+        );
+
+        return;
+      }
+
+      final user =
+          response['user'];
+
+      // 🔥 ENVÍA EL CORREO A PYTHON / ESP32
+      enviarCorreoAPython(
+        user['email'],
+      );
+
+      // 🔥 CONTINÚA LOGIN NORMAL
+      await procesarLogin(user);
+
+    } catch (e) {
+
+      debugPrint(
+        "Error login: $e",
+      );
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Error de conexión con el servidor",
+          ),
+          backgroundColor:
+              Colors.red,
+        ),
+      );
+    }
   }
 
   // ================= LOGIN GOOGLE =================
@@ -136,7 +176,8 @@ class _LoginFormState extends State<LoginForm> {
 
       final response =
           await AuthService.loginGoogle(
-        email: firebaseUser.email ?? '',
+        email:
+            firebaseUser.email ?? '',
       );
 
       if (!response['ok']) {
@@ -148,14 +189,21 @@ class _LoginFormState extends State<LoginForm> {
               response['message'] ??
                   'Error Google',
             ),
-            backgroundColor: Colors.red,
+            backgroundColor:
+                Colors.red,
           ),
         );
 
         return;
       }
 
-      final user = response['user'];
+      final user =
+          response['user'];
+
+      // 🔥 ENVÍA TAMBIÉN A PYTHON
+      enviarCorreoAPython(
+        user['email'],
+      );
 
       await procesarLogin(user);
 
@@ -167,7 +215,8 @@ class _LoginFormState extends State<LoginForm> {
           content: Text(
             'Error Google: $e',
           ),
-          backgroundColor: Colors.red,
+          backgroundColor:
+              Colors.red,
         ),
       );
     }
@@ -187,7 +236,7 @@ class _LoginFormState extends State<LoginForm> {
     final prefs =
         await SharedPreferences.getInstance();
 
-    // 🔥 LIMPIAR DATOS VIEJOS
+    // ================= LIMPIAR =================
     await prefs.remove("correo");
     await prefs.remove("nombre");
     await prefs.remove("fecha");
@@ -195,7 +244,7 @@ class _LoginFormState extends State<LoginForm> {
     final cuestionario =
         user['cuestionario'];
 
-    // ================= FECHA FORMATEADA =================
+    // ================= FECHA =================
     String fechaFormateada = "";
 
     if (user['fechaNacimiento'] != null &&
@@ -231,31 +280,42 @@ class _LoginFormState extends State<LoginForm> {
 
     // ================= GUARDAR DATOS =================
     await perfilProvider.guardarDatos(
-      nombre: user['name'] ?? '',
-      sexo: cuestionario?['sexo'] ?? '',
+
+      nombre:
+          user['name'] ?? '',
+
+      sexo:
+          cuestionario?['sexo'] ?? '',
+
       nombreContacto:
           cuestionario?[
                   'contactoEmergenciaNombre'] ??
               '',
+
       telefonoContacto:
           cuestionario?[
                   'contactoEmergenciaTelefono'] ??
               '',
+
       telefonoUsuario:
           user['telefono'] ?? '',
+
       fechaNacimiento:
           fechaFormateada,
+
       correo:
           user['email'] ?? '',
     );
 
+    // ================= MENSAJE =================
     ScaffoldMessenger.of(context)
         .showSnackBar(
       const SnackBar(
         content: Text(
           "Login exitoso",
         ),
-        backgroundColor: Colors.green,
+        backgroundColor:
+            Colors.green,
       ),
     );
 
@@ -277,12 +337,16 @@ class _LoginFormState extends State<LoginForm> {
         context,
         MaterialPageRoute(
           builder: (_) => Cuestionario(
+
             nombre:
                 user['name'] ?? '',
+
             correo:
                 user['email'] ?? '',
+
             telefono:
                 user['telefono'] ?? '',
+
             fecha:
                 fechaFormateada,
           ),
@@ -297,9 +361,12 @@ class _LoginFormState extends State<LoginForm> {
       context,
       MaterialPageRoute(
         builder: (_) => MainNavigation(
-          tipoHome: tipoHome
-              .toString()
-              .toLowerCase(),
+
+          tipoHome:
+              tipoHome
+                  .toString()
+                  .toLowerCase(),
+
           user: user,
         ),
       ),
@@ -333,15 +400,18 @@ class _LoginFormState extends State<LoginForm> {
 
         title: const Text(
           "Iniciar Sesión",
+
           style: TextStyle(
             color:
-                AppColors.colorBotonPrincipal,
+                AppColors
+                    .colorBotonPrincipal,
           ),
         ),
 
         iconTheme: const IconThemeData(
           color:
-              AppColors.colorBotonPrincipal,
+              AppColors
+                  .colorBotonPrincipal,
         ),
       ),
 
@@ -359,24 +429,32 @@ class _LoginFormState extends State<LoginForm> {
 
             const Text(
               "Bienvenido",
+
               style: TextStyle(
                 fontSize: 22,
                 fontWeight:
                     FontWeight.bold,
                 color:
-                    AppColors.colorBotonPrincipal,
+                    AppColors
+                        .colorBotonPrincipal,
               ),
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(
+              height: 25,
+            ),
 
-            const Text("Correo"),
+            const Text(
+              "Correo",
+            ),
 
             TextField(
 
-              controller: emailCtrl,
+              controller:
+                  emailCtrl,
 
-              decoration: InputDecoration(
+              decoration:
+                  InputDecoration(
 
                 hintText:
                     "ejemplo@ejemplo.com",
@@ -384,9 +462,11 @@ class _LoginFormState extends State<LoginForm> {
                 filled: true,
 
                 fillColor:
-                    AppColors.inputLogin,
+                    AppColors
+                        .inputLogin,
 
-                border: OutlineInputBorder(
+                border:
+                    OutlineInputBorder(
 
                   borderRadius:
                       BorderRadius.circular(
@@ -399,7 +479,9 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(
+              height: 20,
+            ),
 
             const Text(
               "Contraseña",
@@ -407,19 +489,23 @@ class _LoginFormState extends State<LoginForm> {
 
             TextField(
 
-              controller: passCtrl,
+              controller:
+                  passCtrl,
 
               obscureText:
                   ocultarPassword,
 
-              decoration: InputDecoration(
+              decoration:
+                  InputDecoration(
 
                 filled: true,
 
                 fillColor:
-                    AppColors.inputLogin,
+                    AppColors
+                        .inputLogin,
 
-                border: OutlineInputBorder(
+                border:
+                    OutlineInputBorder(
 
                   borderRadius:
                       BorderRadius.circular(
@@ -453,15 +539,20 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(
+              height: 30,
+            ),
 
             // ================= LOGIN NORMAL =================
             SizedBox(
 
-              width: double.infinity,
+              width:
+                  double.infinity,
+
               height: 50,
 
-              child: ElevatedButton(
+              child:
+                  ElevatedButton(
 
                 style:
                     ElevatedButton.styleFrom(
@@ -483,88 +574,13 @@ class _LoginFormState extends State<LoginForm> {
                 onPressed:
                     loginNormal,
 
-<<<<<<< HEAD
-                  if (response['ok']) {
-                    
-                    final user = response['user'];
-                    
-                    await enviarCorreoAPython(
-                      user['email'],
-                    );
-
-                    final perfilProvider =
-                        Provider.of<PerfilProvider>(context, listen: false);
-
-                    //final user = response['user'];
-                    final cuestionario = user['cuestionario'];
-
-                    await perfilProvider.guardarDatos(
-                      nombre: user['name'] ?? '',
-                      //: cuestionario?['edad'] ?? 0,
-                      sexo: cuestionario?['sexo'] ?? '',
-                      nombreContacto: cuestionario?['contactoEmergenciaNombre'] ?? '',
-                      telefonoContacto: cuestionario?['contactoEmergenciaTelefono'] ?? '',
-                      telefonoUsuario: user['telefono'] ?? '', // 🔥 FIX
-                      fechaNacimiento: _formatearFecha(user?['fechaNacimiento']),
-                      correo: user['email'] ?? '',
-                    );
-
-                    final tipoHome = user['tipoHome'];
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Login exitoso"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-
-                    /// SI NO TIENE CUESTIONARIO
-                    if (tipoHome == null ||
-                        tipoHome.toString().isEmpty ||
-                        cuestionario == null) {
-
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => Cuestionario(
-                            nombre: user['name'] ?? '',
-                            correo: emailCtrl.text.trim(),
-                            telefono: user['telefono'] ?? '',
-                            fecha: '',
-                          ),
-                        ),
-                      );
-                      return;
-                    }
-
-                    /// REDIRECCIÓN NORMAL
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => MainNavigation(
-                          tipoHome: tipoHome.toString().toLowerCase(),
-                          user: user,
-                        ),
-                      ),
-                    );
-
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(response['message'] ?? "Error"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-=======
->>>>>>> fd6eaf1aaa53411a09449869d948d6adf9d18d0d
                 child: const Text(
 
                   "Iniciar Sesión",
 
                   style: TextStyle(
                     fontSize: 16,
+
                     color:
                         AppColors
                             .textoClaro,
@@ -573,15 +589,20 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(
+              height: 15,
+            ),
 
             // ================= LOGIN GOOGLE =================
             SizedBox(
 
-              width: double.infinity,
+              width:
+                  double.infinity,
+
               height: 50,
 
-              child: ElevatedButton.icon(
+              child:
+                  ElevatedButton.icon(
 
                 style:
                     ElevatedButton.styleFrom(
@@ -608,7 +629,9 @@ class _LoginFormState extends State<LoginForm> {
                 ),
 
                 label: const Text(
+
                   "Continuar con Google",
+
                   style: TextStyle(
                     color: Colors.black,
                   ),
