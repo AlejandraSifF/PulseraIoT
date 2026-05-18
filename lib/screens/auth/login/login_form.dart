@@ -40,13 +40,13 @@ class _LoginFormState extends State<LoginForm> {
         }),
       );
 
-      print("Respuesta Python:");
-      print(response.body);
+      //print("Respuesta Python:");
+      //print(response.body);
 
     } catch (e) {
 
-      print("Error enviando correo:");
-      print(e);
+      //print("Error enviando correo:");
+      //print(e);
     }
   }
 
