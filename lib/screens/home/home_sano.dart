@@ -76,37 +76,40 @@ class _HomeSanoState extends State<HomeSano> {
             children: [
 
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+  children: [
 
-                children: [
+    Expanded(
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+        children: [
 
-                  Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+          const Text(
+            "Hola, Bienvenido",
+          ),
 
-                    children: [
+          Text(
+            perfilProvider.nombre.isNotEmpty
+                ? perfilProvider.nombre
+                : "Usuario",
 
-                      const Text(
-                        "Hola, Bienvenido",
-                      ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ],
+      ),
+    ),
 
-                      Text(
-                        perfilProvider.nombre.isNotEmpty
-                            ? perfilProvider.nombre
-                            : "Usuario",
-                      ),
-                    ],
-                  ),
+    const SizedBox(width: 10),
 
-                  SizedBox(
-                    width: 200,
-                    child: Buscador(
-                      onNavigate: (index) {},
-                    ),
-                  ),
-                ],
-              ),
+    SizedBox(
+      width: 120,
+      child: Buscador(
+        onNavigate: (index) {},
+      ),
+    ),
+  ],
+),
 
               const SizedBox(height: 20),
 

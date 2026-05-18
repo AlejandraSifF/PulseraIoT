@@ -25,7 +25,12 @@ buzzer = machine.PWM(machine.Pin(27), freq=1000, duty=0)
 oled_display = None
 
 pulso_bajo = 60
-pulso_alto = 100
+pulso_alto = 150
+
+nombre_paciente = "Sin nombre"
+perfil_usuario = "normal"
+movimiento = "reposo"
+edad = 60
 
 def play_tone(freq, duration):
     buzzer.freq(freq)
@@ -252,7 +257,8 @@ class VitalsDisplay:
     def update(self, bpm, spo2, temp, alarm):
         self.oled.fill(0)
 
-        self.oled.text("Monitor Vital", 0, 0)
+        #self.oled.text("Monitor Vital", 0, 0)
+        self.oled.text(nombre_paciente[:16], 0, 0)
 
         bpm_str  = "--" if bpm  is None else "{:.1f}".format(bpm)
         spo2_str = "--" if spo2 is None else "{:.1f}".format(spo2)
@@ -425,8 +431,8 @@ def pulso_limites_normal(edad, movimiento):
 def pulso_limites_diabetes(edad, movimiento):
     global pulso_bajo, pulso_alto
     if movimiento == "reposo":
-        pulso_bajo = 60
-        pulso_alto = 108
+        pulso_bajo = 75
+        pulso_alto = 140
     elif movimiento == "ejercitando":
         pulso_bajo = 60
         pulso_alto = 250
@@ -435,7 +441,7 @@ def pulso_limites_hipertencion(edad, movimiento):
     global pulso_bajo, pulso_alto
     if movimiento == "reposo":
         pulso_bajo = 40
-        pulso_alto = 180
+        pulso_alto = 130
     elif movimiento == "ejercitando":
         pulso_bajo = 60
         pulso_alto = 250
@@ -444,10 +450,38 @@ def pulso_limites_diabetes_hipertencion(edad, movimiento):
     global pulso_bajo, pulso_alto
     if movimiento == "reposo":
         pulso_bajo = 40
-        pulso_alto = 180
+        pulso_alto = 130
     elif movimiento == "ejercitando":
         pulso_bajo = 60        
         pulso_alto = 200
+        
+#--------------------------------------------------------------
+def configurar_perfil():
+
+    global perfil_usuario
+    global edad
+    global movimiento
+
+    print("Configurando perfil:", perfil_usuario)
+
+    if perfil_usuario == "sano":
+        pulso_limites_normal(edad, movimiento)
+
+    elif perfil_usuario == "diabetes":
+        pulso_limites_diabetes(edad, movimiento)
+
+    elif perfil_usuario == "hipertenso":
+        pulso_limites_hipertencion(edad, movimiento)
+
+    elif perfil_usuario == "hipertension y diabetes":
+        pulso_limites_diabetes_hipertencion(edad, movimiento)
+
+    else:
+        pulso_limites_normal(edad, movimiento)
+
+    print("Límites BPM:", pulso_bajo, pulso_alto)
+    
+    
 #------------------------------------------------------------------
 def classify_hr(bpm):
     if bpm is None:       return "sin dato"
@@ -515,6 +549,7 @@ def update_vitals():
             
             
             print(f"HR: {bstr} bpm ({latest_hr_cat}) | SpO2: {sstr}% ({latest_spo2_cat}) | Temp: {tstr} °C ({latest_temp_cat})")
+            
 
             # AQUÍ se actualiza el OLED cada 1s
             if oled_display is not None:
@@ -540,6 +575,7 @@ def vitals_json():
     b = "null" if latest_bpm  is None else f"{latest_bpm:.1f}"
     s = "null" if latest_spo2 is None else f"{latest_spo2:.1f}"
     t = "null" if latest_temp_c is None else f"{latest_temp_c:.2f}"
+    
     return ('{"hr":' + b +
             ',"hr_cat":"' + latest_hr_cat +
             '","spo2":' + s +
@@ -572,46 +608,82 @@ def start_server(ip):
 
     addr = socket.getaddrinfo(ip, 80)[0][-1]
     s = socket.socket()
-    s.bind(addr); s.listen(1); s.settimeout(0.1)
+    s.bind(addr); s.listen(1); s.settimeout(1)
     print("Servidor escuchando en http://{}:80".format(ip))
     
-    #limmites bpm-----------------------------------
-    print("Ingresa tu edad:")
-    edad = int(input("edad: "))
-
-    print("Ingresa tu tipo de perfil:")
-    print("Opciones: normal, diabetes, hipertenso, diabetes_hipertenso")
-    perfil_usuario = input("Perfil: ")
-
-    print("Opciones: ejercitando, reposo")
-    movimiento = input("actividad: ")
-
-    if perfil_usuario == "normal":
-        pulso_limites_normal(edad, movimiento)
-    elif perfil_usuario == "diabetes":
-        pulso_limites_diabetes(edad, movimiento)
-    elif perfil_usuario == "hipertencion":
-        pulso_limites_hipertencion(edad, movimiento)
-    elif perfil_usuario == "diabetes_hipertenso":   
-        pulso_limites_diabetes_hipertencion(edad, movimiento)
-    else:                                            
-        pulso_limites_normal(edad, movimiento)
-    
-    print(f"Límites de pulso configurados: {pulso_bajo} - {pulso_alto} BPM")
+    #-----------------------------------
+      
     #-----------------------------------------------
     oled_display = VitalsDisplay()
-
+    
+    import gc
 
     while True:
         update_vitals()
+        
+        gc.collect()
+        
+        time.sleep_ms(3)
 
         try:
             cl, addr = s.accept()
+            
         except OSError:
             continue
 
         try:
-            request = cl.recv(1024).decode()
+            request = cl.recv(4024).decode()
+            
+            ####
+            # ===================================
+            # RECIBIR CONFIGURACIÓN DESDE PYTHON
+            # ===================================
+
+            if "POST /config" in request:
+
+                global nombre_paciente
+                global perfil_usuario
+                
+
+                try:
+
+                    body = request.split("\r\n\r\n")[1]
+
+                    import ujson
+
+                    datos = ujson.loads(body)
+                    print("datos cargo\n")
+
+                    nombre_paciente = datos.get("name", "SinNombre")
+                    perfil_usuario = datos.get("tipoHome", "normal")
+
+                    configurar_perfil()
+
+                    print("Paciente:", nombre_paciente)
+                    print("Perfil:", perfil_usuario)
+
+                    respuesta = "CONFIG OK"
+
+                    cl.sendall(
+                        "HTTP/1.1 200 OK\r\n"
+                        "Content-Type: text/plain\r\n"
+                        "Access-Control-Allow-Origin: *\r\n"
+                        "\r\n" + respuesta
+                    )
+                    
+                    
+                    continue
+
+                except Exception as e:
+
+                    print("Error config:", e)
+
+                    cl.sendall(
+                        "HTTP/1.1 500 ERROR\r\n"
+                        "Content-Type: text/plain\r\n"
+                        "\r\nERROR"
+                    )
+            ##
 
             if "GET /buzzer" in request:
                 if "state=on1" in request:   play_melody(alarm_melody)
@@ -626,6 +698,7 @@ def start_server(ip):
 
             
             elif "GET /vitals" in request:
+                
                 payload = vitals_json()
                 cl.send("HTTP/1.1 200 OK\r\n"
                         "Content-Type: application/json\r\n"
@@ -637,11 +710,12 @@ def start_server(ip):
 
 
             else:
-                cl.send("HTTP/1.1 404 Not Found\r\n"
+                cl.sendall("HTTP/1.1 404 Not Found\r\n"
                         "Access-Control-Allow-Origin: *\r\n"
                         "\r\n")
         finally:
             cl.close()
+                
 
 # -----------------------------
 # Ejecuta
