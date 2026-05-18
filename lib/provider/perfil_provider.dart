@@ -123,6 +123,26 @@ class PerfilProvider extends ChangeNotifier {
     this.correo = correoFinal;
     notifyListeners();
   }
+  Future actualizarDatosSesion() async {
+
+  final prefs = await SharedPreferences.getInstance();
+
+  correo = prefs.getString("correo") ?? "";
+  nombre = prefs.getString("nombre") ?? "";
+
+  notifyListeners();
+}
+
+  Future actualizarCorreo(String nuevoCorreo) async {
+
+  final prefs = await SharedPreferences.getInstance();
+
+  await prefs.setString("correo", nuevoCorreo);
+
+  correo = nuevoCorreo;
+
+  notifyListeners();
+}
 
   // ================= 🔴 CERRAR SESIÓN =================
 

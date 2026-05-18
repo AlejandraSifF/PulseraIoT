@@ -76,40 +76,40 @@ class _HomeCombinadoState extends State<HomeCombinado> {
             children: [
 
               Row(
-  children: [
+                children: [
 
-    Expanded(
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
 
-          const Text(
-            "Hola, Bienvenido",
-          ),
+                        const Text(
+                          "Hola, Bienvenido",
+                        ),
 
-          Text(
-            perfilProvider.nombre.isNotEmpty
-                ? perfilProvider.nombre
-                : "Usuario",
+                        Text(
+                          perfilProvider.nombre.isNotEmpty
+                              ? perfilProvider.nombre
+                              : "Usuario",
 
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ],
-      ),
-    ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
 
-    const SizedBox(width: 10),
+                  const SizedBox(width: 10),
 
-    SizedBox(
-      width: 120,
-      child: Buscador(
-        onNavigate: (index) {},
-      ),
-    ),
-  ],
-),
+                  SizedBox(
+                    width: 120,
+                    child: Buscador(
+                      onNavigate: (index) {},
+                    ),
+                  ),
+                ],
+              ),
 
               const SizedBox(height: 20),
 
@@ -256,6 +256,13 @@ class _HomeCombinadoState extends State<HomeCombinado> {
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 15),
+
+                      _buildUbicacionCard(
+                        "Ubicación",
+                        "Zacatecas, Centro",
+                      ),
                     ],
                   ),
                 ),
@@ -335,6 +342,80 @@ class _HomeCombinadoState extends State<HomeCombinado> {
               ),
             ),
           )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUbicacionCard(
+    String title,
+    String value,
+  ) {
+
+    return Container(
+
+      width: 291,
+      height: 137,
+
+      padding: const EdgeInsets.all(12),
+
+      decoration: BoxDecoration(
+        color: AppColors.cardColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
+        children: [
+
+          Row(
+            mainAxisAlignment:
+                MainAxisAlignment.end,
+
+            children: [
+
+              Image.asset(
+                "assets/images/gps.png",
+                width: 32,
+                height: 32,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 4),
+
+          const Center(
+            child: Text(
+              "Ubicación:",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: AppColors.textoOscuro,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          const Text(
+            "Lugar de ubicación:",
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textoSecundario,
+            ),
+          ),
+
+          const SizedBox(height: 5),
+
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppColors.textoMedio,
+            ),
+          ),
         ],
       ),
     );

@@ -12,7 +12,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -39,47 +38,65 @@ class _SplashScreenState extends State<SplashScreen> {
 
         decoration: const BoxDecoration(
           gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
               AppColors.splashTop,
               AppColors.splashBottom,
             ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
           ),
         ),
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
 
-            /// LOGO
-            Image.asset(
-              'assets/images/logo.png',
-              width: 180,
-              height: 180,
-            ),
-
-            const SizedBox(height: 25),
-
-            /// TEXTO
-            Text(
-              "Tecnología con corazón",
-              style: AppTextStyles.heading.copyWith(
-                color: AppColors.textoClaro,
-                fontSize: 18,
+              /// LOGO MÁS GRANDE
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.18),
+                      blurRadius: 25,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 240,
+                  height: 240,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 15),
 
-            /// SUBTEXTO (opcional pro)
-            Text(
-              "Cuidando lo que más importa",
-              style: AppTextStyles.secundario.copyWith(
-                color: AppColors.textoClaro.withOpacity(0.8),
+              /// TEXTO PRINCIPAL
+              Text(
+                "Tecnología con corazón",
+                textAlign: TextAlign.center,
+                style: AppTextStyles.heading.copyWith(
+                  color: AppColors.textoClaro,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.6,
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 10),
+
+              /// SUBTEXTO
+              Text(
+                "Cuidando lo que más importa",
+                textAlign: TextAlign.center,
+                style: AppTextStyles.secundario.copyWith(
+                  color: AppColors.textoClaro.withOpacity(0.85),
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

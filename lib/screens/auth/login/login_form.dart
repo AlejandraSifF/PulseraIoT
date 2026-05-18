@@ -120,60 +120,59 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   // ================= LOGIN GOOGLE =================
-Future<void> loginGoogle() async {
+  Future<void> loginGoogle() async {
 
-  try {
+    try {
 
-    final userCredential =
-        await signInWithGoogle();
+      final userCredential =
+          await signInWithGoogle();
 
-    if (userCredential == null) return;
+      if (userCredential == null) return;
 
-    final firebaseUser =
-        userCredential.user;
+      final firebaseUser =
+          userCredential.user;
 
-    if (firebaseUser == null) return;
+      if (firebaseUser == null) return;
 
-    // 🔥 HACER LOGIN, NO REGISTER
-    final response =
-        await AuthService.loginGoogle(
-      email: firebaseUser.email ?? '',
-    );
+      final response =
+          await AuthService.loginGoogle(
+        email: firebaseUser.email ?? '',
+      );
 
-    if (!response['ok']) {
+      if (!response['ok']) {
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          SnackBar(
+            content: Text(
+              response['message'] ??
+                  'Error Google',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        return;
+      }
+
+      final user = response['user'];
+
+      await procesarLogin(user);
+
+    } catch (e) {
 
       ScaffoldMessenger.of(context)
           .showSnackBar(
         SnackBar(
           content: Text(
-            response['message'] ??
-                'Error Google',
+            'Error Google: $e',
           ),
           backgroundColor: Colors.red,
         ),
       );
-
-      return;
     }
-
-    // 🔥 OBTENER USER CORRECTAMENTE
-    final user = response['user'];
-
-    await procesarLogin(user);
-
-  } catch (e) {
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-      SnackBar(
-        content: Text(
-          'Error Google: $e',
-        ),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
+
   // ================= PROCESAR LOGIN =================
   Future<void> procesarLogin(
     dynamic user,
@@ -184,6 +183,14 @@ Future<void> loginGoogle() async {
       context,
       listen: false,
     );
+
+    final prefs =
+        await SharedPreferences.getInstance();
+
+    // 🔥 LIMPIAR DATOS VIEJOS
+    await prefs.remove("correo");
+    await prefs.remove("nombre");
+    await prefs.remove("fecha");
 
     final cuestionario =
         user['cuestionario'];
@@ -217,9 +224,6 @@ Future<void> loginGoogle() async {
     }
 
     // ================= GUARDAR FECHA =================
-    final prefs =
-        await SharedPreferences.getInstance();
-
     await prefs.setString(
       "fecha",
       fechaFormateada,

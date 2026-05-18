@@ -260,13 +260,40 @@ const changePassword = async (req, res) => {
 
 // ================= CHANGE EMAIL =================
 const changeEmail = async (req, res) => {
-  const user = await User.findByIdAndUpdate(
-    req.uid,
-    { email: req.body.newEmail },
-    { new: true }
-  );
 
-  res.json({ ok: true, user });
+  try {
+
+    const { newEmail } = req.body;
+
+    const existe = await User.findOne({
+      email: newEmail
+    });
+
+    if (existe) {
+      return res.status(400).json({
+        ok: false,
+        message: 'Ese correo ya está registrado'
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.uid,
+      { email: newEmail },
+      { new: true }
+    );
+
+    res.json({
+      ok: true,
+      user
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      ok: false,
+      message: 'Error actualizando correo'
+    });
+  }
 };
 
 // ================= 🔥 CUESTIONARIO =================

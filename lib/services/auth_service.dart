@@ -53,11 +53,22 @@ class AuthService {
     final data = jsonDecode(response.body);
 
     if (data['ok'] == true && data['token'] != null) {
-      token = data['token'];
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token!);
-    }
+  token = data['token'];
+
+  final prefs = await SharedPreferences.getInstance();
+
+  await prefs.setString(
+    'token',
+    token!,
+  );
+
+  // 🔥 GUARDAR CORREO
+  await prefs.setString(
+    'correo',
+    data['user']['email'],
+  );
+}
 
     return data;
   }
@@ -151,6 +162,8 @@ class AuthService {
 
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token!);
+          await prefs.setString('correo', data['user']['email'],
+          );
         
         }
 
@@ -185,13 +198,26 @@ class AuthService {
 
       final data = jsonDecode(response.body);
 
-      if (response.statusCode == 200 && data['token'] != null) {
-        token = data['token'];
+      if (response.statusCode == 200 &&
+    data['token'] != null) {
 
-        final prefs = await SharedPreferences.getInstance();
-        print("TOKEN GOOGLE: ${data['token']}");
-        await prefs.setString('token', token!);
-      }
+  token = data['token'];
+
+  final prefs = await SharedPreferences.getInstance();
+
+  print("TOKEN GOOGLE: ${data['token']}");
+
+  await prefs.setString(
+    'token',
+    token!,
+  );
+
+  // 🔥 GUARDAR CORREO
+  await prefs.setString(
+    'correo',
+    data['user']['email'],
+  );
+}
 
       return data;
     } catch (e) {
