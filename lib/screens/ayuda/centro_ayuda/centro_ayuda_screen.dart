@@ -15,6 +15,7 @@ class CentroAyudaScreen extends StatelessWidget {
       backgroundColor: AppColors.fondoPantallaPrincipal,
 
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppColors.colorPrincipal,
         elevation: 0,
         title: const Text(

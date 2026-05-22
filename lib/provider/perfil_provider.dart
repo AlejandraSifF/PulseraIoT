@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 class PerfilProvider extends ChangeNotifier {
 
   File? imagenPerfil;
@@ -147,27 +148,45 @@ class PerfilProvider extends ChangeNotifier {
   // ================= 🔴 CERRAR SESIÓN =================
 
   Future cerrarSesion() async {
-    final prefs = await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
 
-    await prefs.clear(); // 🔥 BORRA TODO
-    AuthService.token = null; // 🔐 Limpiar token estático
-
-    // 🔄 Resetear variables
-    nombre = "";
-    //edad = 0;
-    sexo = "";
-
-    telefonoUsuario = "";
-    nombreContacto = "";
-    telefonoContacto = "";
-
-    fechaNacimiento = "";
-    tipoPerfil = "";
-
-    imagenPerfil = null;
-
-    notifyListeners();
+  try {
+    final google = GoogleSignIn();
+    if (await google.isSignedIn()) {
+      await google.signOut();
+      await google.disconnect();
+    }
+  } catch (e) {
+    print("Google logout error ignorado: $e");
   }
+
+  //await prefs.clear();
+  //AuthService.token = null;
+   await prefs.remove("nombre");
+    await prefs.remove("sexo");
+    await prefs.remove("telefonoUsuario");
+    await prefs.remove("nombreContacto");
+    await prefs.remove("telefonoContacto");
+    await prefs.remove("fecha");
+    await prefs.remove("tipoPerfil");
+    await prefs.remove("correo");
+
+    // 🚨 IMPORTANTE:
+    // Si quieres que la foto NO se pierda, NO la borres
+    // await prefs.remove("imagen");
+
+    AuthService.token = null;
+  nombre = "";
+  sexo = "";
+  telefonoUsuario = "";
+  nombreContacto = "";
+  telefonoContacto = "";
+  fechaNacimiento = "";
+  tipoPerfil = "";
+  imagenPerfil = null;
+
+  notifyListeners();
+}
 
   int get edadCalculada {
   if (fechaNacimiento.isEmpty) return 0;

@@ -10,6 +10,8 @@ import '../../provider/perfil_provider.dart';
 import '../../services/auth_service.dart';
 import 'package:intl/intl.dart';
 
+
+
 class EditarPerfilSubpantalla extends StatefulWidget {
   const EditarPerfilSubpantalla({super.key});
 
@@ -104,7 +106,8 @@ class _EditarPerfilSubpantallaState
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? imagen =
-                      await _picker.pickImage(source: ImageSource.gallery);
+                      await _picker.pickImage(source: ImageSource.gallery,
+                      requestFullMetadata: true,);
 
                   if (imagen != null) {
                     setState(() {

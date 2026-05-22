@@ -5,7 +5,7 @@ import '../models/vitals_model.dart';
 class VitalsService {
 
   static const String baseUrl =
-      'http://192.168.1.241/vitals';//http://192.168.1.241:80
+      'http://192.168.1.120/vitals';//http://192.168.1.241:80
 
   static Future<VitalsModel?> getVitals() async {
     try {

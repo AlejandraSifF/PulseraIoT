@@ -13,7 +13,13 @@ const {
   changeEmail,
   guardarCuestionario,
   actualizarPerfil,
-  setPassword
+  setPassword,
+
+  // 🔥 NUEVO
+  forgotPassword,
+  verifyResetCode,
+  resetPassword
+
 } = require('../controllers/auth.controller');
 
 // ================== RUTAS ==================
@@ -26,18 +32,68 @@ router.get('/private', authJWT, (req, res) => {
   });
 });
 
+// ================= AUTH =================
+
 router.post('/register', register);
 router.post('/login', login);
 router.post('/test-user', testUser);
 router.get('/renew', authJWT, renew);
-router.put('/change-password', authJWT, changePassword);
-router.put('/change-email', authJWT, changeEmail);
 router.post('/login-google', loginGoogle);
 router.post('/register-google', registerGoogle);
-router.post('/set-password', authJWT, setPassword);
 
-// 🔥 YA NO HAY LÓGICA AQUÍ
-router.post('/cuestionario', authJWT, guardarCuestionario);
-router.put('/update-profile', authJWT, actualizarPerfil);
+// ================= PASSWORD =================
+
+router.put(
+  '/change-password',
+  authJWT,
+  changePassword
+);
+
+router.post(
+  '/set-password',
+  authJWT,
+  setPassword
+);
+
+// 🔥 RECUPERAR CONTRASEÑA
+
+router.post(
+  '/forgot-password',
+  forgotPassword
+);
+
+router.post(
+  '/verify-reset-code',
+  verifyResetCode
+);
+
+router.post(
+  '/reset-password',
+  resetPassword
+);
+
+// ================= EMAIL =================
+
+router.put(
+  '/change-email',
+  authJWT,
+  changeEmail
+);
+
+// ================= CUESTIONARIO =================
+
+router.post(
+  '/cuestionario',
+  authJWT,
+  guardarCuestionario
+);
+
+// ================= PERFIL =================
+
+router.put(
+  '/update-profile',
+  authJWT,
+  actualizarPerfil
+);
 
 module.exports = router;

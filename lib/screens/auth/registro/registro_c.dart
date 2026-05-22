@@ -210,291 +210,303 @@ class _RegistroCState extends State<RegistroC> {
         ),
       ),
 
-      body: Padding(
+      body: SafeArea(
 
-        padding:
-            const EdgeInsets.symmetric(
-          horizontal: 24,
-          vertical: 10,
-        ),
+        child: SingleChildScrollView(
 
-        child: Column(
+          keyboardDismissBehavior:
+              ScrollViewKeyboardDismissBehavior.onDrag,
 
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 10,
+          ),
 
-          children: [
+          child: Column(
 
-            const SizedBox(height: 10),
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
 
-            const Text(
+            children: [
 
-              "Crea una contraseña segura para proteger tu cuenta.",
+              const SizedBox(height: 10),
 
-              style:
-                  AppTextStyles.secundario,
-            ),
+              const Text(
 
-            const SizedBox(height: 5),
+                "Crea una contraseña segura para proteger tu cuenta.",
 
-            /*const Text(
-
-              "La contraseña debe tener mínimo 8 caracteres.",
-
-              style:
-                  AppTextStyles.secundario,
-            ),*/
-
-            const SizedBox(height: 25),
-
-            const Text(
-
-              "Contraseña",
-
-              style:
-                  AppTextStyles.subtitulo,
-            ),
-
-            const SizedBox(height: 8),
-
-            TextField(
-
-              controller: passCtrl,
-
-              obscureText:
-                  ocultarPass,
-
-              decoration: _inputDecoration(
-
-                "",
-
-                ocultarPass,
-
-                () {
-
-                  setState(() {
-
-                    ocultarPass =
-                        !ocultarPass;
-                  });
-                },
-
-              ).copyWith(
-
-                helperText:
-                    "Usa al menos 8 caracteres",
-
-                errorText:
-                    passCtrl.text.isEmpty
-                        ? null
-                        : (passCtrl.text.length < 8
-                            ? "La contraseña debe tener mínimo 8 caracteres"
-                            : null),
+                style:
+                    AppTextStyles.secundario,
               ),
 
-              onChanged: (value) {
+              const SizedBox(height: 25),
 
-                _validarPassword(
-                  value,
-                );
-              },
-            ),
+              const Text(
 
-            const SizedBox(height: 15),
+                "Contraseña",
 
-            // 🔥 BARRA PASSWORD
-            Column(
+                style:
+                    AppTextStyles.subtitulo,
+              ),
 
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              const SizedBox(height: 8),
 
-              children: [
+              TextField(
 
-                ClipRRect(
+                controller: passCtrl,
 
-                  borderRadius:
-                      BorderRadius.circular(10),
+                obscureText:
+                    ocultarPass,
 
-                  child:
-                      LinearProgressIndicator(
+                decoration: _inputDecoration(
 
-                    value:
-                        fuerzaPassword,
+                  "",
 
-                    minHeight: 8,
+                  ocultarPass,
 
-                    backgroundColor:
-                        Colors.grey.shade300,
+                  () {
 
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(
+                    setState(() {
 
-                      fuerzaPassword <= 0.25
-                          ? Colors.red
-                          : fuerzaPassword <= 0.50
-                              ? Colors.orange
-                              : fuerzaPassword <= 0.75
-                                  ? Colors.yellow.shade700
-                                  : Colors.green,
-                    ),
-                  ),
+                      ocultarPass =
+                          !ocultarPass;
+                    });
+                  },
+
+                ).copyWith(
+
+                  helperText:
+                      "Usa al menos 8 caracteres",
+
+                  errorText:
+                      passCtrl.text.isEmpty
+                          ? null
+                          : (passCtrl.text.length < 8
+                              ? "La contraseña debe tener mínimo 8 caracteres"
+                              : null),
                 ),
 
-                const SizedBox(height: 10),
+                onChanged: (value) {
 
-                Text(
+                  _validarPassword(
+                    value,
+                  );
+                },
+              ),
 
-                  fuerzaPassword <= 0.25
-                      ? "Contraseña débil"
-                      : fuerzaPassword <= 0.50
-                          ? "Contraseña media"
-                          : fuerzaPassword <= 0.75
-                              ? "Contraseña buena"
-                              : "Contraseña segura",
+              const SizedBox(height: 15),
 
-                  style: TextStyle(
+              Column(
 
-                    fontWeight:
-                        FontWeight.w600,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
 
-                    color:
+                children: [
+
+                  ClipRRect(
+
+                    borderRadius:
+                        BorderRadius.circular(10),
+
+                    child:
+                        LinearProgressIndicator(
+
+                      value:
+                          fuerzaPassword,
+
+                      minHeight: 8,
+
+                      backgroundColor:
+                          Colors.grey.shade300,
+
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(
+
                         fuerzaPassword <= 0.25
                             ? Colors.red
                             : fuerzaPassword <= 0.50
                                 ? Colors.orange
                                 : fuerzaPassword <= 0.75
-                                    ? Colors.amber.shade700
+                                    ? Colors.yellow.shade700
                                     : Colors.green,
+                      ),
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                _itemValidacion(
-                  "Mínimo 8 caracteres",
-                  tiene8Caracteres,
-                ),
+                  Text(
 
-                _itemValidacion(
-                  "Al menos una mayúscula",
-                  tieneMayuscula,
-                ),
+                    fuerzaPassword <= 0.25
+                        ? "Contraseña débil"
+                        : fuerzaPassword <= 0.50
+                            ? "Contraseña media"
+                            : fuerzaPassword <= 0.75
+                                ? "Contraseña buena"
+                                : "Contraseña segura",
 
-                _itemValidacion(
-                  "Al menos un número",
-                  tieneNumero,
-                ),
+                    style: TextStyle(
 
-                _itemValidacion(
-                  "Un carácter especial (!@#\$...)",
-                  tieneEspecial,
-                ),
-              ],
-            ),
+                      fontWeight:
+                          FontWeight.w600,
 
-            const SizedBox(height: 20),
+                      color:
+                          fuerzaPassword <= 0.25
+                              ? Colors.red
+                              : fuerzaPassword <= 0.50
+                                  ? Colors.orange
+                                  : fuerzaPassword <= 0.75
+                                      ? Colors.amber.shade700
+                                      : Colors.green,
+                    ),
+                  ),
 
-            const Text(
+                  const SizedBox(height: 12),
 
-              "Confirmar contraseña",
+                  _itemValidacion(
+                    "Mínimo 8 caracteres",
+                    tiene8Caracteres,
+                  ),
 
-              style:
-                  AppTextStyles.subtitulo,
-            ),
+                  _itemValidacion(
+                    "Al menos una mayúscula",
+                    tieneMayuscula,
+                  ),
 
-            const SizedBox(height: 8),
+                  _itemValidacion(
+                    "Al menos un número",
+                    tieneNumero,
+                  ),
 
-            TextField(
-
-              controller:
-                  confirmCtrl,
-
-              obscureText:
-                  ocultarConfirm,
-
-              decoration:
-                  _inputDecoration(
-
-                "",
-
-                ocultarConfirm,
-
-                () {
-
-                  setState(() {
-
-                    ocultarConfirm =
-                        !ocultarConfirm;
-                  });
-                },
-
-              ).copyWith(
-
-                errorText:
-                    confirmCtrl.text.isEmpty
-                        ? null
-                        : (confirmCtrl.text !=
-                                passCtrl.text
-                            ? "Las contraseñas no coinciden"
-                            : null),
+                  _itemValidacion(
+                    "Un carácter especial (!@#\$...)",
+                    tieneEspecial,
+                  ),
+                ],
               ),
 
-              onChanged: (_) {
+              const SizedBox(height: 20),
 
-                setState(() {});
-              },
-            ),
+              const Text(
 
-            const SizedBox(height: 35),
+                "Confirmar contraseña",
 
-            Center(
+                style:
+                    AppTextStyles.subtitulo,
+              ),
 
-              child: SizedBox(
+              const SizedBox(height: 8),
 
-                width: 260,
-                height: 50,
+              TextField(
 
-                child:
-                    ElevatedButton(
+                controller:
+                    confirmCtrl,
 
-                  onPressed:
-                      _todoValido()
+                obscureText:
+                    ocultarConfirm,
 
-                          ? () async {
+                decoration:
+                    _inputDecoration(
 
-                              final response =
-                                  await AuthService.register(
+                  "",
 
-                                name:
-                                    widget.nombre,
+                  ocultarConfirm,
 
-                                email:
-                                    widget.correo,
+                  () {
 
-                                password:
-                                    passCtrl.text,
+                    setState(() {
 
-                                telefono:
-                                    widget.telefono,
-                              );
+                      ocultarConfirm =
+                          !ocultarConfirm;
+                    });
+                  },
 
-                              if (response['ok']) {
+                ).copyWith(
 
-                                final loginResp =
-                                    await AuthService.login(
+                  errorText:
+                      confirmCtrl.text.isEmpty
+                          ? null
+                          : (confirmCtrl.text !=
+                                  passCtrl.text
+                              ? "Las contraseñas no coinciden"
+                              : null),
+                ),
+
+                onChanged: (_) {
+
+                  setState(() {});
+                },
+              ),
+
+              const SizedBox(height: 35),
+
+              Center(
+
+                child: SizedBox(
+
+                  width: 260,
+                  height: 50,
+
+                  child:
+                      ElevatedButton(
+
+                    onPressed:
+                        _todoValido()
+
+                            ? () async {
+
+                                FocusScope.of(context).unfocus();
+
+                                final response =
+                                    await AuthService.register(
+
+                                  name:
+                                      widget.nombre,
 
                                   email:
                                       widget.correo,
 
                                   password:
                                       passCtrl.text,
+
+                                  telefono:
+                                      widget.telefono,
                                 );
 
-                                print(
-                                  "TOKEN DESPUÉS DE REGISTER: ${AuthService.token}",
-                                );
+                                if (response['ok']) {
 
-                                if (!loginResp['ok']) {
+                                  final loginResp =
+                                      await AuthService.login(
+
+                                    email:
+                                        widget.correo,
+
+                                    password:
+                                        passCtrl.text,
+                                  );
+
+                                  print(
+                                    "TOKEN DESPUÉS DE REGISTER: ${AuthService.token}",
+                                  );
+
+                                  if (!loginResp['ok']) {
+
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(
+
+                                      const SnackBar(
+
+                                        content: Text(
+                                          "Error en login automático",
+                                        ),
+
+                                        backgroundColor:
+                                            Colors.red,
+                                      ),
+                                    );
+
+                                    return;
+                                  }
 
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(
@@ -502,102 +514,86 @@ class _RegistroCState extends State<RegistroC> {
                                     const SnackBar(
 
                                       content: Text(
-                                        "Error en login automático",
+                                        "Cuenta creada con éxito",
+                                      ),
+
+                                      backgroundColor:
+                                          AppColors.exito,
+                                    ),
+                                  );
+
+                                  Navigator.pushReplacement(
+
+                                    context,
+
+                                    MaterialPageRoute(
+
+                                      builder: (_) =>
+                                          Cuestionario(
+
+                                        nombre:
+                                            widget.nombre,
+
+                                        correo:
+                                            widget.correo,
+
+                                        telefono:
+                                            widget.telefono,
+
+                                        fecha:
+                                            widget.fecha,
+                                      ),
+                                    ),
+                                  );
+
+                                } else {
+
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+
+                                    SnackBar(
+
+                                      content: Text(
+
+                                        response['message'] ??
+                                            "Error en registro",
                                       ),
 
                                       backgroundColor:
                                           Colors.red,
                                     ),
                                   );
-
-                                  return;
                                 }
-
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(
-
-                                  const SnackBar(
-
-                                    content: Text(
-                                      "Cuenta creada con éxito",
-                                    ),
-
-                                    backgroundColor:
-                                        AppColors.exito,
-                                  ),
-                                );
-
-                                Navigator.pushReplacement(
-
-                                  context,
-
-                                  MaterialPageRoute(
-
-                                    builder: (_) =>
-                                        Cuestionario(
-
-                                      nombre:
-                                          widget.nombre,
-
-                                      correo:
-                                          widget.correo,
-
-                                      telefono:
-                                          widget.telefono,
-
-                                      fecha:
-                                          widget.fecha,
-                                    ),
-                                  ),
-                                );
-
-                              } else {
-
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(
-
-                                  SnackBar(
-
-                                    content: Text(
-
-                                      response['message'] ??
-                                          "Error en registro",
-                                    ),
-
-                                    backgroundColor:
-                                        Colors.red,
-                                  ),
-                                );
                               }
-                            }
 
-                          : null,
-
-                  style:
-                      ElevatedButton.styleFrom(
-
-                    backgroundColor:
-                        AppColors.colorBotonPrincipal,
-
-                    shape:
-                        RoundedRectangleBorder(
-
-                      borderRadius:
-                          BorderRadius.circular(30),
-                    ),
-                  ),
-
-                  child: const Text(
-
-                    "Crear cuenta",
+                            : null,
 
                     style:
-                        AppTextStyles.boton,
+                        ElevatedButton.styleFrom(
+
+                      backgroundColor:
+                          AppColors.colorBotonPrincipal,
+
+                      shape:
+                          RoundedRectangleBorder(
+
+                        borderRadius:
+                            BorderRadius.circular(30),
+                      ),
+                    ),
+
+                    child: const Text(
+
+                      "Crear cuenta",
+
+                      style:
+                          AppTextStyles.boton,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -638,6 +638,39 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ),
             ),
+
+            // ================= OLVIDASTE PASSWORD =================
+            const SizedBox(
+              height: 10,
+            ),
+
+            Center(
+
+              child: TextButton(
+
+                onPressed: () {
+
+                  Navigator.pushNamed(
+                    context,
+                    '/recuperar-password',
+                  );
+                },
+
+                child: const Text(
+
+                  '¿Olvidaste tu contraseña?',
+
+                  style: TextStyle(
+
+                    color:
+                        AppColors
+                            .colorBotonPrincipal,
+
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

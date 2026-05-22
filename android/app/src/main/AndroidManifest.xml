@@ -2,6 +2,7 @@
      <!--PERMISO PARA LLAMADAS -->
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
      
     <application
         android:label="prueba"

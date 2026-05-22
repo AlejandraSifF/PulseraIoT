@@ -313,26 +313,75 @@ class _RegistroPState extends State<RegistroP> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: (_todosCamposCompletos() && aceptaTerminos)
-                      ? () async {
+    ? () async {
 
-                          final prefs =
-                              await SharedPreferences.getInstance();
-                          await prefs.setString(
-                              "correo", correoCtrl.text.trim());
+        // 🔥 VERIFICAR SI EL CORREO YA EXISTE
+        final existe =
+            await AuthService
+                .verificarCorreo(
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => RegistroC(
-                                nombre: nombreCtrl.text,
-                                correo: correoCtrl.text,
-                                telefono: telefonoCompleto,
-                                fecha: fechaCtrl.text,
-                              ),
-                            ),
-                          );
-                        }
-                      : null,
+          email:
+              correoCtrl.text,
+        );
+
+        // 🔴 YA EXISTE
+        if (existe['exists']
+            == true) {
+
+          ScaffoldMessenger.of(
+                  context)
+              .showSnackBar(
+
+            const SnackBar(
+
+              content: Text(
+                "Ya existe una cuenta con este correo, inicia sesión",
+              ),
+
+              backgroundColor:
+                  Colors.red,
+            ),
+          );
+
+          return;
+        }
+
+        // 🟢 CONTINUAR REGISTRO
+        final prefs =
+            await SharedPreferences
+                .getInstance();
+
+        await prefs.setString(
+          "correo",
+          correoCtrl.text
+              .trim(),
+        );
+
+        Navigator.push(
+
+          context,
+
+          MaterialPageRoute(
+
+            builder: (_) =>
+                RegistroC(
+
+              nombre:
+                  nombreCtrl.text,
+
+              correo:
+                  correoCtrl.text,
+
+              telefono:
+                  telefonoCompleto,
+
+              fecha:
+                  fechaCtrl.text,
+            ),
+          ),
+        );
+      }
+    : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.colorBotonPrincipal,
                     shape: RoundedRectangleBorder(
@@ -388,31 +437,49 @@ class _RegistroPState extends State<RegistroP> {
 final email = user.email ?? '';
 final nombre = user.displayName ?? '';
 
-// 🔥 llamar a tu backend
-final result = await AuthService.registerGoogle(
+// =========================
+// REGISTRAR GOOGLE
+// =========================
+final register =
+    await AuthService.registerGoogle(
+
   name: nombre,
   email: email,
   telefono: telefonoCompleto,
-  fechaNacimiento: fechaCtrl.text,
+  fechaNacimiento:
+      fechaCtrl.text,
 );
 
-// 🔴 SI YA EXISTE
-if (result['yaRegistrado'] == true) {
-  ScaffoldMessenger.of(context).showSnackBar(
+// 🔴 YA EXISTE
+if (register['exists'] == true) {
+
+  ScaffoldMessenger.of(context)
+      .showSnackBar(
+
     const SnackBar(
-      content: Text("Cuenta existente, inicia sesión"),
-      backgroundColor: Colors.orange,
+
+      content: Text(
+        "Ya existe una cuenta con este correo, inicia sesión",
+      ),
+
+      backgroundColor:
+          Colors.red,
     ),
   );
 
   return;
 }
 
-// 🟢 SI ES NUEVO
+// 🟢 NUEVO USUARIO
 Navigator.pushReplacement(
+
   context,
+
   MaterialPageRoute(
-    builder: (_) => CompletarPerfil(
+
+    builder: (_) =>
+        CompletarPerfil(
+
       nombre: nombre,
       correo: email,
     ),
