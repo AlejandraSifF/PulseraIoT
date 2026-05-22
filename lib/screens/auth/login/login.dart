@@ -9,196 +9,472 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
 
-        /// FONDO GENERAL
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
+      backgroundColor: const Color(0xFFF7F3FF),
 
-              /// ARRIBA MÁS CLARITO
-              Color(0xFFF8FAFF),
+      body: Stack(
+        children: [
 
-              /// ABAJO MÁS OSCURITO
-              Color(0xFFDCE3F8),
-            ],
+          /// FONDO
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+
+                colors: [
+                  Color(0xFFF8F3FF),
+                  Color(0xFFE5E9FF),
+                  Color(0xFFD8F5EC),
+                  Color(0xFFEFE7FF),
+                ],
+
+                stops: [
+                  0.0,
+                  0.35,
+                  0.70,
+                  1.0,
+                ],
+              ),
+            ),
           ),
-        ),
 
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+          /// LUZ SUPERIOR
+          Positioned(
+            top: -120,
+            right: -80,
 
-              child: Container(
-                width: double.infinity,
+            child: Container(
+              width: 320,
+              height: 320,
 
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 45,
-                ),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
 
-                decoration: BoxDecoration(
+                color: const Color(0xFFDCCBFF)
+                    .withOpacity(.40),
+              ),
+            ),
+          ),
 
-                  /// CARD BLANCA
-                  color: Colors.white,
+          /// LUZ CENTRAL
+          Positioned(
+            top: 170,
+            left: -110,
 
-                  borderRadius: BorderRadius.circular(38),
+            child: Container(
+              width: 280,
+              height: 280,
 
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.08),
-                      blurRadius: 24,
-                      offset: const Offset(0, 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+
+                color: const Color(0xFFBFECDD)
+                    .withOpacity(.35),
+              ),
+            ),
+          ),
+
+          /// RUEDA MORADA
+          Positioned(
+            top: 90,
+            right: -70,
+
+            child: Container(
+              width: 180,
+              height: 180,
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+
+                color: const Color(0xFFCDB6FF)
+                    .withOpacity(.45),
+              ),
+            ),
+          ),
+
+          /// RUEDA VERDE
+          Positioned(
+            bottom: 120,
+            left: -90,
+
+            child: Container(
+              width: 220,
+              height: 220,
+
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+
+                color: const Color(0xFFA7E3CF)
+                    .withOpacity(.45),
+              ),
+            ),
+          ),
+
+          /// DETALLES ABAJO
+          Positioned(
+            bottom: -50,
+            left: -60,
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE7D9FA),
+                borderRadius: BorderRadius.circular(200),
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: -40,
+            right: -40,
+            child: Container(
+              width: 190,
+              height: 190,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD8EFE5),
+                borderRadius: BorderRadius.circular(200),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24),
+
+                child: Container(
+                  width: double.infinity,
+
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 40,
+                  ),
+
+                  decoration: BoxDecoration(
+
+                    color: Colors.white.withOpacity(.82),
+
+                    borderRadius:
+                        BorderRadius.circular(45),
+
+                    border: Border.all(
+                      color: Colors.white.withOpacity(.5),
+                      width: 1.5,
                     ),
-                  ],
-                ),
 
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            Colors.black.withOpacity(.08),
 
-                    /// LOGO CON FONDO MÁS OSCURO
-                    Container(
-                      width: 185,
-                      height: 185,
+                        blurRadius: 35,
+                        spreadRadius: 1,
 
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                        offset: const Offset(0, 14),
+                      ),
+                    ],
+                  ),
 
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
 
-                            /// MÁS OSCURITO
-                            Color(0xFFB9C2FF),
-                            Color(0xFFAEDBCB),
+                      /// LOGO
+                      Container(
+                        width: 165,
+                        height: 165,
+
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFFC3CCFF),
+                              Color(0xFFAEDBCB),
+                            ],
+                          ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors
+                                  .colorBotonPrincipal
+                                  .withOpacity(.18),
+                              blurRadius: 25,
+                              spreadRadius: 2,
+                            ),
                           ],
                         ),
 
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.colorPrincipal
-                                .withOpacity(.18),
-                            blurRadius: 20,
-                            spreadRadius: 3,
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.all(18),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      /// TITULO
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: const TextSpan(
+                          children: [
+                            TextSpan(
+                              text: 'Tecnología con\n',
+                              style: TextStyle(
+                                fontSize: 27,
+                                fontWeight:
+                                    FontWeight.bold,
+                                color:
+                                    Color(0xFF6E5A7A),
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'corazón',
+                              style: TextStyle(
+                                fontSize: 27,
+                                fontWeight:
+                                    FontWeight.bold,
+                                color:
+                                    Color(0xFF9A72F8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 14),
+
+                      /// DECORACIÓN
+                      Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 45,
+                            height: 2,
+                            color:
+                                const Color(0xFFE2D7F6),
+                          ),
+
+                          const Padding(
+                            padding:
+                                EdgeInsets.symmetric(
+                                    horizontal: 10),
+                            child: Icon(
+                              Icons.favorite,
+                              size: 18,
+                              color:
+                                  Color.fromRGBO(
+                                      54,
+                                      149,
+                                      119,
+                                      1,
+                                  ),
+                            ),
+                          ),
+
+                          Container(
+                            width: 45,
+                            height: 2,
+                            color:
+                                const Color(0xFFE2D7F6),
                           ),
                         ],
                       ),
 
-                      child: Padding(
-                        padding: const EdgeInsets.all(18),
-                        child: Image.asset(
-                          'assets/images/logo.png',
-                          fit: BoxFit.contain,
+                      const SizedBox(height: 18),
+
+                      /// TEXTO
+                      const Text(
+                        "Cuidamos tu salud,\nestés donde estés",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF6B6578),
+                          height: 1.6,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: .2,
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 30),
+                      const SizedBox(height: 36),
 
-                    /// TITULO
-                    const Text(
-                      "Tecnología con corazón",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 29,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF6B5B73),
-                        letterSpacing: 0.2,
-                      ),
-                    ),
+                      /// BOTON LOGIN
+                      SizedBox(
+                        width: double.infinity,
+                        height: 58,
 
-                    const SizedBox(height: 12),
+                        child: ElevatedButton.icon(
+                          style:
+                              ElevatedButton.styleFrom(
+                            backgroundColor:
+                                AppColors
+                                    .colorBotonPrincipal,
 
-                    /// SUBTEXTO
-                    const Text(
-                      "Cuidamos tu salud,\nestés donde estés",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black54,
-                        height: 1.5,
-                      ),
-                    ),
+                            elevation: 5,
 
-                    const SizedBox(height: 38),
+                            shadowColor: Colors.black
+                                .withOpacity(.18),
 
-                    /// BOTÓN LOGIN
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              AppColors.colorBotonPrincipal,
-
-                          elevation: 4,
-
-                          shadowColor:
-                              Colors.black.withOpacity(.15),
-
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(30),
-                          ),
-                        ),
-
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const LoginForm(),
+                            shape:
+                                RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius
+                                      .circular(30),
                             ),
-                          );
-                        },
+                          ),
 
-                        child: const Text(
-                          "Iniciar Sesión",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const LoginForm(),
+                              ),
+                            );
+                          },
+
+                          icon: const Icon(
+                            Icons.person_outline,
                             color: Colors.white,
                           ),
-                        ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 20),
-
-                    /// REGISTRARSE
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => RegistroP(),
+                          label: const Text(
+                            "Iniciar Sesión",
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight:
+                                  FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        );
-                      },
-
-                      child: const Text(
-                        "Registrarse",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-
-                          /// COLOR DEL CÍRCULO DEL LOGO
-                          color: Color(0xFF8CBFAF),
                         ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 18),
+
+                      /// REGISTRO
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+
+                        child: OutlinedButton.icon(
+                          style:
+                              OutlinedButton.styleFrom(
+                            side: const BorderSide(
+                              color:
+                                  Color.fromRGBO(
+                                      54,
+                                      149,
+                                      119,
+                                      1,
+                                  ),
+                            ),
+
+                            shape:
+                                RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius
+                                      .circular(30),
+                            ),
+                          ),
+
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    RegistroP(),
+                              ),
+                            );
+                          },
+
+                          icon: const Icon(
+                            Icons.person_add_alt_1,
+                            color:
+                                Color.fromRGBO(
+                                    54,
+                                    149,
+                                    119,
+                                    1,
+                                ),
+                          ),
+
+                          label: const Text(
+                            "Registrarse",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight:
+                                  FontWeight.bold,
+                              color:
+                                  Color.fromRGBO(
+                                      54,
+                                      149,
+                                      119,
+                                      1,
+                                  ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      /// SEGURIDAD
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.45),
+
+                          borderRadius:
+                              BorderRadius.circular(20),
+                        ),
+
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+
+                            Icon(
+                              Icons.verified_user_rounded,
+                              color: Color(0xFF8D76A8),
+                              size: 17,
+                            ),
+
+                            SizedBox(width: 8),
+
+                            Text(
+                              "Tu información está protegida",
+
+                              style: TextStyle(
+                                color: Color(0xFF6E687A),
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: .2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

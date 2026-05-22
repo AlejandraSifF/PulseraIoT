@@ -2,83 +2,168 @@ import 'package:flutter/material.dart';
 
 class AppColors {
 
-  // FONDOS DE LA APLICACIÓN:
-  // Fondo general de todas las pantallas (lavanda muy claro)
-  static const Color fondoPantallaPrincipal = Color(0xFFF9F6FB);
+  // =========================
+  // FONDOS GENERALES
+  // =========================
 
-  // Fondo blanco para secciones limpias
-  static const Color fondoBlanco = Color(0xFFFFFFFF);
+  /// Fondo principal claro lavanda
+  static const Color fondoPantallaPrincipal =
+      Color(0xFFF9F6FB);
 
-  // Fondo de campos de texto (crema claro)
-  static const Color fondoCamposTexto = Color(0xFFF5F5DA);
+  /// Fondo blanco
+  static const Color fondoBlanco =
+      Color(0xFFFFFFFF);
 
-  // COLOR PRINCIPAL:
-  /// Color principal de la app (usado en AppBar y elementos destacados)
-  static const Color colorPrincipal = Color(0xFF8A8EFE);
+  /// Fondo campos de texto
+  static const Color fondoCamposTexto =
+      Color(0xFFF5F5DA);
 
-  // BOTONES:
-  // Color del botón principal
-  static const Color colorBotonPrincipal = Color(0xFF7E647F);
+  /// Fondo login
+  static const Color fondoLogin =
+      Color(0xFFE6ECFF);
 
-  // ELEMENTOS DECORATIVOS:
-  // Color del círculo en los íconos de configuración
-  static const Color fondoCirculoIcono = Color(0xFFFFC9FA);
+  /// Fondo registro
+  static const Color fondoRegistro =
+      Color(0xFFF4F2F4);
 
-  // COLORES DE TEXTO:
+  // =========================
+  // COLORES PRINCIPALES
+  // =========================
+
+  /// Morado principal elegante
+  static const Color colorPrincipal =
+      Color(0xFF8A8EFE);
+
+  /// Botón principal
+  static const Color colorBotonPrincipal =
+      Color(0xFF7E647F);
+
+  /// Verde principal nuevo ❤️
+  static const Color verdePrincipal =
+      Color.fromRGBO(54, 149, 119, 1);
+
+  /// Verde suave decorativo
+  static const Color verdeSuave =
+      Color(0xFFA7E3CF);
+
+  /// Verde clarito fondo
+  static const Color verdePastel =
+      Color(0xFFD8F5EC);
+
+  // =========================
+  // TEXTO
+  // =========================
+
   /// Texto oscuro
-  static const Color textoOscuro = Colors.black;
+  static const Color textoOscuro =
+      Colors.black;
 
-  // Texto claro (para fondos oscuros)
-  static const Color textoClaro = Colors.white;
+  /// Texto claro
+  static const Color textoClaro =
+      Colors.white;
 
-  // COLORES DE ESTADO:
-  // Color para mensajes de éxito
-  static const Color exito = Colors.green;
+  /// Texto secundario
+  static const Color textoSecundario =
+      Colors.black54;
 
-  // Color para mensajes de error
-  static const Color error = Colors.red;
-  // Más colores personalizados pueden ser añadidos aquí según sea necesario:
-  // INPUT LOGIN (morado claro)
-  static const Color inputLogin = Color(0xFFF3E2F3);
+  /// Texto medio
+  static const Color textoMedio =
+      Colors.black87;
 
-  // TEXTO SECUNDARIO
-  static const Color textoSecundario = Colors.black54;
+  /// Labels
+  static const Color textoLabel =
+      Colors.black;
 
-  // BOTÓN GOOGLE
-  static const Color botonGoogle = Colors.red;
+  // =========================
+  // INPUTS
+  // =========================
 
-  // FONDO LOGIN
-static const Color fondoLogin = Color(0xFFE6ECFF);
+  /// Input login
+  static const Color inputLogin =
+      Color(0xFFF3E2F3);
 
-// TEXTO MEDIO (más fuerte que secundario)
-static const Color textoMedio = Colors.black87;
+  /// Input registro
+  static const Color inputRegistro =
+      Color(0xFFEEDAF0);
 
-// COLOR DE LINKS (ej: Registrarse)
-static const Color colorLink = Color(0xFF3B6FF5);
+  // =========================
+  // LINKS Y BOTONES
+  // =========================
 
-// FONDO REGISTRO
-static const Color fondoRegistro = Color(0xFFF4F2F4);
+  /// Color links
+  static const Color colorLink =
+      Color(0xFF3B6FF5);
 
-// INPUT REGISTRO (ligeramente distinto al login)
-static const Color inputRegistro = Color(0xFFEEDAF0);
+  /// Google
+  static const Color botonGoogle =
+      Colors.red;
 
-// LABELS
-static const Color textoLabel = Colors.black;
+  // =========================
+  // TARJETAS Y DECORACIÓN
+  // =========================
 
-// GRADIENTES
-static const Color gradientStart = Color(0xFFEEF2FF);
-static const Color gradientEnd = Color(0xFFFFFFFF);
+  /// Cards suaves
+  static const Color cardColor =
+      Color(0xFFF0DDF7);
 
-// TARJETAS / CAMPOS
-static const Color cardColor = Color(0xFFF0DDF7);
+  /// Iconos suaves
+  static const Color iconoSuave =
+      Color(0xFFE4C7F1);
 
-// DECORACIÓN EXTRA
-static const Color iconoSuave = Color(0xFFE4C7F1);
+  /// Círculos decorativos morados
+  static const Color moradoDecoracion =
+      Color(0xFFCDB6FF);
 
-// DIVIDER
-static const Color divider = Color(0xFFE5E7EB);
+  /// Círculos decorativos verdes
+  static const Color verdeDecoracion =
+      Color(0xFFBFECDD);
 
-static const Color splashTop = Color(0xFF4FAF8F);
-static const Color splashBottom = Color(0xFFB9EEFF);
+  /// Fondo círculo iconos
+  static const Color fondoCirculoIcono =
+      Color(0xFFFFC9FA);
 
+  /// Divider
+  static const Color divider =
+      Color(0xFFE5E7EB);
+
+  // =========================
+  // SPLASH / GRADIENTES
+  // =========================
+
+  static const Color splashTop =
+      Color(0xFF4FAF8F);
+
+  static const Color splashBottom =
+      Color(0xFFB9EEFF);
+
+  /// Gradiente inicio
+  static const Color gradientStart =
+      Color(0xFFEEF2FF);
+
+  /// Gradiente final
+  static const Color gradientEnd =
+      Color(0xFFFFFFFF);
+
+  /// Fondo degradado login
+  static const Color fondoGradient1 =
+      Color(0xFFF8F3FF);
+
+  static const Color fondoGradient2 =
+      Color(0xFFE5E9FF);
+
+  static const Color fondoGradient3 =
+      Color(0xFFD8F5EC);
+
+  static const Color fondoGradient4 =
+      Color(0xFFEFE7FF);
+
+  // =========================
+  // ESTADOS
+  // =========================
+
+  static const Color exito =
+      Colors.green;
+
+  static const Color error =
+      Colors.red;
 }

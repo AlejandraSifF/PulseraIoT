@@ -28,15 +28,15 @@ class NotificationService {
     await _messaging.subscribeToTopic("alertas_importantes");
     await _messaging.subscribeToTopic("mensajes");
 
-    print("✅ Suscrito a alertas_importantes y mensajes");
+    print("Suscrito a alertas_importantes y mensajes");
   }
 
   Future<void> _printToken() async {
     String? token = await _messaging.getToken();
-    print("🔥 FCM TOKEN: $token");
+    print("FCM TOKEN: $token");
 
     _messaging.onTokenRefresh.listen((newToken) {
-      print("🔄 Nuevo token: $newToken");
+      print("Nuevo token: $newToken");
     });
   }
 
@@ -74,7 +74,7 @@ class NotificationService {
 
   Future<void> _setupFCMListeners() async {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("📩 Mensaje recibido tipo: ${message.data['tipo']}");
+      print("Mensaje recibido tipo: ${message.data['tipo']}");
       _handleMessage(message);
     });
   }

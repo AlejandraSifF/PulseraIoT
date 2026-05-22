@@ -543,101 +543,116 @@ class _LoginFormState extends State<LoginForm> {
               height: 30,
             ),
 
+          
             // ================= LOGIN NORMAL =================
-            SizedBox(
+Center(
+  child: SizedBox(
 
-              width:
-                  double.infinity,
+    width: 250,
+    height: 42,
 
-              height: 50,
+    child:
+        ElevatedButton(
 
-              child:
-                  ElevatedButton(
+      style:
+          ElevatedButton.styleFrom(
 
-                style:
-                    ElevatedButton.styleFrom(
+        backgroundColor:
+            AppColors
+                .colorBotonPrincipal,
 
-                  backgroundColor:
-                      AppColors
-                          .colorBotonPrincipal,
+        shape:
+            RoundedRectangleBorder(
 
-                  shape:
-                      RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(
+            25,
+          ),
+        ),
+      ),
 
-                    borderRadius:
-                        BorderRadius.circular(
-                      25,
-                    ),
-                  ),
-                ),
+      onPressed:
+          loginNormal,
 
-                onPressed:
-                    loginNormal,
+      child: const Text(
 
-                child: const Text(
+        "Iniciar Sesión",
 
-                  "Iniciar Sesión",
+        style: TextStyle(
+          fontSize: 14,
+          color:
+              AppColors
+                  .textoClaro,
+        ),
+      ),
+    ),
+  ),
 
-                  style: TextStyle(
-                    fontSize: 16,
+),
 
-                    color:
-                        AppColors
-                            .textoClaro,
-                  ),
-                ),
-              ),
-            ),
+const SizedBox(height: 18),
 
-            const SizedBox(
-              height: 15,
-            ),
+Center(
+  child: Text(
+    "o",
+    style: TextStyle(
+      fontSize: 14,
+      color: Colors.grey,
+    ),
+  ),
+),
+
+const SizedBox(height: 18),
 
             // ================= LOGIN GOOGLE =================
-            SizedBox(
+Center(
+  child: SizedBox(
 
-              width:
-                  double.infinity,
+    width: 250,
+    height: 42,
 
-              height: 50,
+    child:
+        ElevatedButton.icon(
 
-              child:
-                  ElevatedButton.icon(
+      style:
+          ElevatedButton.styleFrom(
 
-                style:
-                    ElevatedButton.styleFrom(
+        backgroundColor:
+            Colors.white,
 
-                  backgroundColor:
-                      Colors.white,
+        elevation: 1,
 
-                  shape:
-                      RoundedRectangleBorder(
+        shape:
+            RoundedRectangleBorder(
 
-                    borderRadius:
-                        BorderRadius.circular(
-                      25,
-                    ),
-                  ),
-                ),
+          borderRadius:
+              BorderRadius.circular(
+            25,
+          ),
+        ),
+      ),
 
-                onPressed:
-                    loginGoogle,
+      onPressed:
+          loginGoogle,
 
-                icon: const Icon(
-                  Icons.login,
-                  color: Colors.black,
-                ),
+      icon: Image.asset(
+        'assets/images/logo_google.png',
+        width: 20,
+        height: 20,
+      ),
 
-                label: const Text(
+      label: const Text(
 
-                  "Continuar con Google",
-
-                  style: TextStyle(
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
+        "Continuar con Google",
+        
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+        ),
+      ),
+    ),
+  ),
+),
 
             // ================= OLVIDASTE PASSWORD =================
             const SizedBox(
