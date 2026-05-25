@@ -10,7 +10,8 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      backgroundColor: const Color(0xFFF7F3FF),
+      backgroundColor:
+          AppColors.fondoPantallaPrincipal,
 
       body: Stack(
         children: [
@@ -24,10 +25,10 @@ class LoginScreen extends StatelessWidget {
                 end: Alignment.bottomRight,
 
                 colors: [
-                  Color(0xFFF8F3FF),
-                  Color(0xFFE5E9FF),
-                  Color(0xFFD8F5EC),
-                  Color(0xFFEFE7FF),
+                  AppColors.fondoGradient1,
+                  AppColors.fondoGradient2,
+                  AppColors.fondoGradient3,
+                  AppColors.fondoGradient4,
                 ],
 
                 stops: [
@@ -52,7 +53,8 @@ class LoginScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
 
-                color: const Color(0xFFDCCBFF)
+                color: AppColors
+                    .moradoDecoracion
                     .withOpacity(.40),
               ),
             ),
@@ -70,7 +72,8 @@ class LoginScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
 
-                color: const Color(0xFFBFECDD)
+                color: AppColors
+                    .verdeDecoracion
                     .withOpacity(.35),
               ),
             ),
@@ -88,7 +91,8 @@ class LoginScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
 
-                color: const Color(0xFFCDB6FF)
+                color: AppColors
+                    .moradoDecoracion
                     .withOpacity(.45),
               ),
             ),
@@ -106,35 +110,43 @@ class LoginScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
 
-                color: const Color(0xFFA7E3CF)
+                color: AppColors
+                    .verdeSuave
                     .withOpacity(.45),
               ),
             ),
           ),
 
-          /// DETALLES ABAJO
+          /// DETALLES ABAJO IZQUIERDA
           Positioned(
             bottom: -50,
             left: -60,
+
             child: Container(
               width: 220,
               height: 220,
+
               decoration: BoxDecoration(
-                color: const Color(0xFFE7D9FA),
-                borderRadius: BorderRadius.circular(200),
+                color: AppColors.cardColor,
+                borderRadius:
+                    BorderRadius.circular(200),
               ),
             ),
           ),
 
+          /// DETALLES ABAJO DERECHA
           Positioned(
             bottom: -40,
             right: -40,
+
             child: Container(
               width: 190,
               height: 190,
+
               decoration: BoxDecoration(
-                color: const Color(0xFFD8EFE5),
-                borderRadius: BorderRadius.circular(200),
+                color: AppColors.verdePastel,
+                borderRadius:
+                    BorderRadius.circular(200),
               ),
             ),
           ),
@@ -143,43 +155,52 @@ class LoginScreen extends StatelessWidget {
             child: Center(
               child: SingleChildScrollView(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 24),
+                    const EdgeInsets.symmetric(
+                  horizontal: 24,
+                ),
 
                 child: Container(
                   width: double.infinity,
 
-                  padding: const EdgeInsets.symmetric(
+                  padding:
+                      const EdgeInsets.symmetric(
                     horizontal: 28,
                     vertical: 40,
                   ),
 
                   decoration: BoxDecoration(
 
-                    color: Colors.white.withOpacity(.82),
+                    color:
+                        Colors.white.withOpacity(.82),
 
                     borderRadius:
                         BorderRadius.circular(45),
 
                     border: Border.all(
-                      color: Colors.white.withOpacity(.5),
+                      color:
+                          Colors.white.withOpacity(.5),
                       width: 1.5,
                     ),
 
                     boxShadow: [
                       BoxShadow(
                         color:
-                            Colors.black.withOpacity(.08),
+                            Colors.black.withOpacity(
+                                .08),
 
                         blurRadius: 35,
                         spreadRadius: 1,
 
-                        offset: const Offset(0, 14),
+                        offset:
+                            const Offset(0, 14),
                       ),
                     ],
                   ),
 
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize:
+                        MainAxisSize.min,
+
                     children: [
 
                       /// LOGO
@@ -190,20 +211,28 @@ class LoginScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
 
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                          gradient:
+                              const LinearGradient(
+                            begin:
+                                Alignment.topLeft,
+                            end:
+                                Alignment
+                                    .bottomRight,
+
                             colors: [
-                              Color(0xFFC3CCFF),
-                              Color(0xFFAEDBCB),
+                              AppColors
+                                  .moradoDecoracion,
+                              AppColors
+                                  .verdeSuave,
                             ],
                           ),
 
                           boxShadow: [
                             BoxShadow(
                               color: AppColors
-                                  .colorBotonPrincipal
-                                  .withOpacity(.18),
+                                  .verdePrincipal
+                                  .withOpacity(.20),
+
                               blurRadius: 25,
                               spreadRadius: 2,
                             ),
@@ -212,7 +241,9 @@ class LoginScreen extends StatelessWidget {
 
                         child: Padding(
                           padding:
-                              const EdgeInsets.all(18),
+                              const EdgeInsets.all(
+                                  18),
+
                           child: Image.asset(
                             'assets/images/logo.png',
                             fit: BoxFit.contain,
@@ -224,27 +255,36 @@ class LoginScreen extends StatelessWidget {
 
                       /// TITULO
                       RichText(
-                        textAlign: TextAlign.center,
+                        textAlign:
+                            TextAlign.center,
+
                         text: const TextSpan(
                           children: [
+
                             TextSpan(
-                              text: 'Tecnología con\n',
+                              text:
+                                  'Tecnología con\n',
+
                               style: TextStyle(
                                 fontSize: 27,
                                 fontWeight:
                                     FontWeight.bold,
-                                color:
-                                    Color(0xFF6E5A7A),
+
+                                color: Color(
+                                    0xFF6E5A7A),
                               ),
                             ),
+
                             TextSpan(
                               text: 'corazón',
+
                               style: TextStyle(
                                 fontSize: 27,
                                 fontWeight:
                                     FontWeight.bold,
-                                color:
-                                    Color(0xFF9A72F8),
+
+                                color: AppColors
+                                    .verdePrincipal,
                               ),
                             ),
                           ],
@@ -256,37 +296,40 @@ class LoginScreen extends StatelessWidget {
                       /// DECORACIÓN
                       Row(
                         mainAxisAlignment:
-                            MainAxisAlignment.center,
+                            MainAxisAlignment
+                                .center,
+
                         children: [
+
                           Container(
                             width: 45,
                             height: 2,
-                            color:
-                                const Color(0xFFE2D7F6),
+
+                            color: AppColors
+                                .iconoSuave,
                           ),
 
                           const Padding(
                             padding:
                                 EdgeInsets.symmetric(
-                                    horizontal: 10),
+                              horizontal: 10,
+                            ),
+
                             child: Icon(
                               Icons.favorite,
                               size: 18,
-                              color:
-                                  Color.fromRGBO(
-                                      54,
-                                      149,
-                                      119,
-                                      1,
-                                  ),
+
+                              color: AppColors
+                                  .verdePrincipal,
                             ),
                           ),
 
                           Container(
                             width: 45,
                             height: 2,
-                            color:
-                                const Color(0xFFE2D7F6),
+
+                            color: AppColors
+                                .iconoSuave,
                           ),
                         ],
                       ),
@@ -296,12 +339,20 @@ class LoginScreen extends StatelessWidget {
                       /// TEXTO
                       const Text(
                         "Cuidamos tu salud,\nestés donde estés",
-                        textAlign: TextAlign.center,
+
+                        textAlign:
+                            TextAlign.center,
+
                         style: TextStyle(
                           fontSize: 15,
+
                           color: Color(0xFF6B6578),
+
                           height: 1.6,
-                          fontWeight: FontWeight.w500,
+
+                          fontWeight:
+                              FontWeight.w500,
+
                           letterSpacing: .2,
                         ),
                       ),
@@ -313,29 +364,37 @@ class LoginScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 58,
 
-                        child: ElevatedButton.icon(
+                        child:
+                            ElevatedButton.icon(
+
                           style:
-                              ElevatedButton.styleFrom(
+                              ElevatedButton
+                                  .styleFrom(
+
                             backgroundColor:
                                 AppColors
                                     .colorBotonPrincipal,
 
                             elevation: 5,
 
-                            shadowColor: Colors.black
-                                .withOpacity(.18),
+                            shadowColor:
+                                Colors.black
+                                    .withOpacity(
+                                        .18),
 
                             shape:
                                 RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius
-                                      .circular(30),
+                                      .circular(
+                                          30),
                             ),
                           ),
 
                           onPressed: () {
                             Navigator.push(
                               context,
+
                               MaterialPageRoute(
                                 builder: (_) =>
                                     const LoginForm(),
@@ -350,10 +409,13 @@ class LoginScreen extends StatelessWidget {
 
                           label: const Text(
                             "Iniciar Sesión",
+
                             style: TextStyle(
                               fontSize: 19,
+
                               fontWeight:
                                   FontWeight.bold,
+
                               color: Colors.white,
                             ),
                           ),
@@ -367,30 +429,31 @@ class LoginScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 56,
 
-                        child: OutlinedButton.icon(
+                        child:
+                            OutlinedButton.icon(
+
                           style:
-                              OutlinedButton.styleFrom(
+                              OutlinedButton
+                                  .styleFrom(
+
                             side: const BorderSide(
-                              color:
-                                  Color.fromRGBO(
-                                      54,
-                                      149,
-                                      119,
-                                      1,
-                                  ),
+                              color: AppColors
+                                  .verdePrincipal,
                             ),
 
                             shape:
                                 RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius
-                                      .circular(30),
+                                      .circular(
+                                          30),
                             ),
                           ),
 
                           onPressed: () {
                             Navigator.push(
                               context,
+
                               MaterialPageRoute(
                                 builder: (_) =>
                                     RegistroP(),
@@ -399,29 +462,24 @@ class LoginScreen extends StatelessWidget {
                           },
 
                           icon: const Icon(
-                            Icons.person_add_alt_1,
-                            color:
-                                Color.fromRGBO(
-                                    54,
-                                    149,
-                                    119,
-                                    1,
-                                ),
+                            Icons
+                                .person_add_alt_1,
+
+                            color: AppColors
+                                .verdePrincipal,
                           ),
 
                           label: const Text(
                             "Registrarse",
+
                             style: TextStyle(
                               fontSize: 18,
+
                               fontWeight:
                                   FontWeight.bold,
-                              color:
-                                  Color.fromRGBO(
-                                      54,
-                                      149,
-                                      119,
-                                      1,
-                                  ),
+
+                              color: AppColors
+                                  .verdePrincipal,
                             ),
                           ),
                         ),
@@ -431,25 +489,35 @@ class LoginScreen extends StatelessWidget {
 
                       /// SEGURIDAD
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding:
+                            const EdgeInsets
+                                .symmetric(
                           horizontal: 14,
                           vertical: 10,
                         ),
 
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(.45),
+                          color: Colors.white
+                              .withOpacity(.45),
 
                           borderRadius:
-                              BorderRadius.circular(20),
+                              BorderRadius
+                                  .circular(20),
                         ),
 
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                          mainAxisSize:
+                              MainAxisSize.min,
+
                           children: const [
 
                             Icon(
-                              Icons.verified_user_rounded,
-                              color: Color(0xFF8D76A8),
+                              Icons
+                                  .verified_user_rounded,
+
+                              color: AppColors
+                                  .verdePrincipal,
+
                               size: 17,
                             ),
 
@@ -459,19 +527,72 @@ class LoginScreen extends StatelessWidget {
                               "Tu información está protegida",
 
                               style: TextStyle(
-                                color: Color(0xFF6E687A),
+                                color: Color(
+                                    0xFF6E687A),
+
                                 fontSize: 12.5,
-                                fontWeight: FontWeight.w500,
+
+                                fontWeight:
+                                    FontWeight
+                                        .w500,
+
                                 letterSpacing: .2,
+                                
                               ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 28),
+
+/// LINEA DECORATIVA
+Container(
+  width: double.infinity,
+  height: 2,
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.transparent,
+        AppColors.verdePrincipal.withOpacity(.35),
+        Colors.transparent,
+      ],
+    ),
+  ),
+),
+
+const SizedBox(height: 5),
+
+/// CORAZÓN + ECG
+Align(
+  alignment: Alignment.centerRight,
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+
+      Icon(
+        Icons.favorite,
+        color: AppColors.colorBotonPrincipal,
+        size: 36,
+      ),
+
+      const SizedBox(width: 4),
+
+      SizedBox(
+        width: 100,
+        height: 60,
+        child: Image.asset(
+          'assets/images/ecg.png',
+          fit: BoxFit.contain,
+        ),
+      ),
+    ],
+  ),
+),
                     ],
                   ),
                 ),
               ),
+    
             ),
           ),
         ],

@@ -38,7 +38,7 @@ class AppColors {
   static const Color colorBotonPrincipal =
       Color(0xFF7E647F);
 
-  /// Verde principal nuevo ❤️
+  /// Verde principal nuevo
   static const Color verdePrincipal =
       Color.fromRGBO(54, 149, 119, 1);
 
@@ -73,6 +73,14 @@ class AppColors {
   /// Labels
   static const Color textoLabel =
       Colors.black;
+
+  /// Texto elegante gris/morado
+  static const Color textoElegante =
+      Color(0xFF6B6578);
+
+  /// Texto seguridad
+  static const Color textoSeguridad =
+      Color(0xFF6E687A);
 
   // =========================
   // INPUTS
@@ -126,6 +134,14 @@ class AppColors {
   static const Color divider =
       Color(0xFFE5E7EB);
 
+  /// Borde glassmorphism
+  static const Color bordeGlass =
+      Color(0x80FFFFFF);
+
+  /// Fondo tarjeta transparente
+  static const Color cardTransparente =
+      Color(0xD1FFFFFF);
+
   // =========================
   // SPLASH / GRADIENTES
   // =========================
@@ -156,6 +172,38 @@ class AppColors {
 
   static const Color fondoGradient4 =
       Color(0xFFEFE7FF);
+
+  // =========================
+  // LOGIN DECORACIONES
+  // =========================
+
+  /// Luz morada superior
+  static const Color luzMorada =
+      Color(0xFFDCCBFF);
+
+  /// Luz verde central
+  static const Color luzVerde =
+      Color(0xFFBFECDD);
+
+  /// Decoración abajo izquierda
+  static const Color decoracionMorada =
+      Color(0xFFE7D9FA);
+
+  /// Decoración abajo derecha
+  static const Color decoracionVerde =
+      Color(0xFFD8EFE5);
+
+  /// Línea decorativa
+  static const Color lineaDecorativa =
+      Color(0xFFE2D7F6);
+
+  /// Título principal
+  static const Color tituloPrincipal =
+      Color(0xFF6E5A7A);
+
+  /// Título destacado
+  static const Color tituloDestacado =
+      Color(0xFF9A72F8);
 
   // =========================
   // ESTADOS

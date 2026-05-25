@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 
 import '../../theme/app_colors.dart';
 import 'nueva_password.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RecuperarPasswordScreen extends StatefulWidget {
 
@@ -37,12 +38,40 @@ class _RecuperarPasswordScreenState
   bool codigoEnviado = false;
   bool loading = false;
 
+  String correoUsuario = "";
+
   bool reenviarDisponible = true;
   int segundosRestantes = 60;
   Timer? timer;
+  
+  // @override
 
   final String baseUrl =
       'http://10.0.2.2:3000/api/auth';
+
+      @override
+void initState() {
+  super.initState();
+
+  if (!widget.volverALogin) {
+    cargarCorreo();
+  }
+}
+
+Future<void> cargarCorreo() async {
+
+  final prefs =
+      await SharedPreferences.getInstance();
+
+  setState(() {
+
+    correoUsuario =
+        prefs.getString('correo') ?? '';
+
+    emailController.text =
+        correoUsuario;
+  });
+}
 
   void iniciarContador() {
     setState(() {
@@ -233,8 +262,10 @@ class _RecuperarPasswordScreenState
             children: [
               const SizedBox(height: 20),
 
-              const Text(
-                'Ingresa tu correo electrónico',
+              Text(
+                widget.volverALogin
+                    ? 'Ingresa tu correo electrónico'
+                    : '¿Olvidaste tu contraseña?',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -245,8 +276,10 @@ class _RecuperarPasswordScreenState
 
               const SizedBox(height: 10),
 
-              const Text(
-                'Te enviaremos un código para recuperar tu contraseña.',
+              Text(
+                widget.volverALogin
+                    ? 'Te enviaremos un código para recuperar tu contraseña.'
+                    : 'Te enviaremos un código para recuperar tu contraseña asociado a tu cuenta.',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -255,67 +288,86 @@ class _RecuperarPasswordScreenState
 
               const SizedBox(height: 30),
 
-              const Text('Correo'),
-              const SizedBox(height: 8),
+if (widget.volverALogin) ...[
+  const Text('Correo'),
+  const SizedBox(height: 8),
 
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  hintText:
-                      'example@example.com',
-                  filled: true,
-                  fillColor:
-                      AppColors.inputLogin,
-                  border:
-                      OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius
-                            .circular(12),
-                    borderSide:
-                        BorderSide.none,
-                  ),
-                ),
-              ),
+  TextField(
+    controller: emailController,
+    decoration: InputDecoration(
+      hintText: 'example@example.com',
+      filled: true,
+      fillColor: AppColors.inputLogin,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+    ),
+  ),
 
-              const SizedBox(height: 20),
+  const SizedBox(height: 20),
+] else ...[
 
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style:
-                      ElevatedButton
-                          .styleFrom(
-                    backgroundColor:
-                        AppColors
-                            .colorBotonPrincipal,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius
-                              .circular(25),
-                    ),
-                  ),
-                  onPressed:
-                      loading ||
-                              !reenviarDisponible
-                          ? null
-                          : enviarCodigo,
-                  child: Text(
-                    loading
-                        ? 'Enviando...'
-                        : reenviarDisponible
-                            ? 'Enviar código'
-                            : 'Enviar de nuevo en (${segundosRestantes}s)',
-                    style:
-                        const TextStyle(
-                      fontSize: 16,
-                      color: AppColors
-                          .textoClaro,
-                    ),
-                  ),
-                ),
-              ),
+  const Text(
+  'Correo',
+  style: TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+  ),
+),
+
+const SizedBox(height: 8),
+  const SizedBox(height: 8),
+Container(
+    width: double.infinity,
+    padding: const EdgeInsets.symmetric(
+      horizontal: 15,
+      vertical: 18,
+    ),
+    decoration: BoxDecoration(
+      color: AppColors.inputLogin,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Text(
+      correoUsuario,
+      style: const TextStyle(
+        fontSize: 15,
+        color: Colors.black87,
+      ),
+    ),
+  ),
+
+  const SizedBox(height: 20),
+],
+SizedBox(
+  width: double.infinity,
+  height: 50,
+  child: ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor:
+          AppColors.colorBotonPrincipal,
+      shape: RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(25),
+      ),
+    ),
+    onPressed:
+        loading || !reenviarDisponible
+            ? null
+            : enviarCodigo,
+    child: Text(
+      loading
+          ? 'Enviando...'
+          : reenviarDisponible
+              ? 'Enviar código'
+              : 'Enviar de nuevo en (${segundosRestantes}s)',
+      style: const TextStyle(
+        fontSize: 16,
+        color: AppColors.textoClaro,
+      ),
+    ),
+  ),
+),
 
               if (codigoEnviado) ...[
                 const SizedBox(height: 30),
