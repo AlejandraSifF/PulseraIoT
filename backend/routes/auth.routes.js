@@ -16,9 +16,9 @@ const {
   setPassword,
 
   // 🔥 NUEVO
-  forgotPassword,
-  verifyResetCode,
-  resetPassword
+  //forgotPassword,
+  //verifyResetCode,
+  //resetPassword
 
 } = require('../controllers/auth.controller');
 
@@ -56,10 +56,10 @@ router.post(
 );
 
 // 🔥 RECUPERAR CONTRASEÑA
-
+/*
 router.post(
   '/forgot-password',
-  forgotPassword
+  //forgotPassword
 );
 
 router.post(
@@ -70,7 +70,7 @@ router.post(
 router.post(
   '/reset-password',
   resetPassword
-);
+);*/
 
 // ================= EMAIL =================
 

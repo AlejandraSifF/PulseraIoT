@@ -4,14 +4,14 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-//Nuevo
+/*//Nuevo
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-});
+});*/
 
 // ================= TEST USER =================
 const testUser = async (req, res) => {
@@ -635,6 +635,7 @@ const actualizarPerfil = async (req, res) => {
 
   }
 };
+/*
 // ================= FORGOT PASSWORD =================
 const forgotPassword = async (req, res) => {
   try {
@@ -817,7 +818,7 @@ const resetPassword = async (req, res) => {
     });
   }
 };
-
+*/
 // ================= 🔥 SET NEW PASSWORD =================
 const setPassword = async (req, res) => {
 
@@ -863,7 +864,7 @@ module.exports = {
   guardarCuestionario,
   actualizarPerfil,
   setPassword, 
-  forgotPassword,
-  verifyResetCode,
-  resetPassword
+  //forgotPassword,
+  //verifyResetCode,
+  //resetPassword
 };

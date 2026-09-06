@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth.routes');
 const connectDB = require('./config/db');
 const Controllers = require('./controllers/auth.controller');
 //const authJWT = require('./middlewares/authJWT');
+const passwordResetRoutes = require('./routes/passwordReset.routes');//nuevo hoy
 
 //AGREGUE 1
 const reportRoutes = require('./routes/reporte.routes');
@@ -20,5 +21,6 @@ app.use(cors());
 
 app.use('/api/auth', authRoutes);
 app.use('/api', reportRoutes);//nuevo
+app.use('/api/password-reset', passwordResetRoutes)//nuevo hoy
 
 module.exports = app;

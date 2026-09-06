@@ -7,7 +7,6 @@ import 'provider/perfil_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-// 🔥 IMPORTAR
 import 'screens/password_rec/recuperar_password.dart';
 
 void main() async {

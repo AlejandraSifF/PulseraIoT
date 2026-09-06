@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   telefono: { type: String, default: '' },
 
-
+/*
   //NUEVO B
   resetCode: {
     type: String,
@@ -34,7 +34,7 @@ resetToken: {
   type: String,
   default: null,
 },
-
+*/
 
   // 🔥 NUEVO
   tipoHome: { type: String, default: null },
