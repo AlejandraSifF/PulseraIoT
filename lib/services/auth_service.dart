@@ -458,6 +458,51 @@ class AuthService {
 }
 
   // ==================================================
+  // VERIFICAR CORREO GOOGLE
+  // ==================================================
+
+  static Future<Map<String, dynamic>> verificarCorreoGoogle({
+    required String email,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          '$baseUrl/verificar-correo-google',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email.trim().toLowerCase(),
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'ok': true,
+          'exists': data['exists'] == true,
+        };
+      }
+
+      return {
+        'ok': false,
+        'exists': false,
+        'message':
+            data['message'] ??
+            'Error al verificar el correo',
+      };
+    } catch (e) {
+      return {
+        'ok': false,
+        'exists': false,
+        'message': e.toString(),
+      };
+    }
+  }
+
+  // ==================================================
   // ACTUALIZAR PERFIL
   // ==================================================
   static Future<Map<String, dynamic>>

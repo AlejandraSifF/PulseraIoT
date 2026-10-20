@@ -14,8 +14,8 @@ from machine import SoftI2C, I2C, Pin
 # -----------------------------
 # Configuración Wi‑Fi
 # -----------------------------
-SSID = "LABSOL NETWORK"
-PASSWORD = "L4b.50L1.N3t"
+SSID = "E13-ALUMNOS"
+PASSWORD = "HOLAMUNDO2026"
 #-----------------------------
 
 # -----------------------------

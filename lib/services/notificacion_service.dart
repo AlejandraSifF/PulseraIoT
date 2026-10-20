@@ -24,7 +24,7 @@ class NotificationService {
     await _setupFCMListeners();
     await _printToken();
 
-    // 🔥 SUSCRIPCIÓN TEMPORAL PARA PRUEBA
+    // SUSCRIPCIÓN TEMPORAL PARA PRUEBA
     await _messaging.subscribeToTopic("alertas_importantes");
     await _messaging.subscribeToTopic("mensajes");
 

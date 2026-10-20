@@ -5,6 +5,7 @@ const authJWT = require('../middleware/authJWT');
 const {
   register,
   registerGoogle,
+  verificarCorreoGoogle,
   login,
   loginGoogle,
   testUser,
@@ -40,7 +41,7 @@ router.post('/test-user', testUser);
 router.get('/renew', authJWT, renew);
 router.post('/login-google', loginGoogle);
 router.post('/register-google', registerGoogle);
-
+router.post('/verificar-correo-google', verificarCorreoGoogle);
 // ================= PASSWORD =================
 
 router.put(

@@ -6,10 +6,13 @@ import 'package:prueba/screens/auth/google/completar_perfil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'registro_c.dart';
 //import 'package:prueba/screens/cuestionario/cuestionario.dart';
+
 import '../../ayuda/centro_ayuda/terminos_condiciones.dart';
 import '../../ayuda/centro_ayuda/politica_de_privacidad.dart';
+
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+
 import '../../../services/auth_service.dart';
 //import '../../../services/auth_service.dart';
 //import '../google/completar_perfil.dart';
@@ -28,7 +31,9 @@ class _RegistroPState extends State<RegistroP> {
 
   String codigoPais = 'MX';
   String telefonoCompleto = '';
-  TextEditingController telefonoController = TextEditingController();
+
+  TextEditingController telefonoController =
+      TextEditingController();
 
   bool correoValido = true;
   bool aceptaTerminos = false;
@@ -52,59 +57,78 @@ class _RegistroPState extends State<RegistroP> {
   }
 
   /*Future<UserCredential?> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    
+    final GoogleSignInAccount? googleUser =
+        await GoogleSignIn().signIn();
+
     // cerrar sesión previa para evitar conflictos
     await GoogleSignIn().signOut();
 
     //preguntar al usuario que cuenta usar para iniciar sesión
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    if (googleUser == null) return null;
-
-    final googleAuth = await googleUser.authentication;
-
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    return await FirebaseAuth.instance.signInWithCredential(credential);
-  } catch (e) {
-    print("Error en inicio de sesión con Google: $e");
-    return null;
-  }*/
-
-  Future<UserCredential?> signInWithGoogle() async {
-  try {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
-    // 🔥 cerrar sesión primero
-    await googleSignIn.signOut();
-
-    // 🔥 pedir cuenta
     final GoogleSignInAccount? googleUser =
-        await googleSignIn.signIn();
+        await GoogleSignIn().signIn();
 
     if (googleUser == null) return null;
 
-    final googleAuth = await googleUser.authentication;
+    final googleAuth =
+        await googleUser.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+    final credential =
+        GoogleAuthProvider.credential(
+      accessToken:
+          googleAuth.accessToken,
+      idToken:
+          googleAuth.idToken,
     );
 
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    return await FirebaseAuth.instance
+        .signInWithCredential(credential);
 
   } catch (e) {
     print("Error en inicio de sesión con Google: $e");
     return null;
   }
-}
+  }*/
+
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn =
+          GoogleSignIn();
+
+      // 🔥 cerrar sesión primero
+      await googleSignIn.signOut();
+
+      // 🔥 pedir cuenta
+      final GoogleSignInAccount? googleUser =
+          await googleSignIn.signIn();
+
+      if (googleUser == null) return null;
+
+      final googleAuth =
+          await googleUser.authentication;
+
+      final credential =
+          GoogleAuthProvider.credential(
+        accessToken:
+            googleAuth.accessToken,
+        idToken:
+            googleAuth.idToken,
+      );
+
+      return await FirebaseAuth.instance
+          .signInWithCredential(credential);
+    } catch (e) {
+      print(
+        "Error en inicio de sesión con Google: $e",
+      );
+
+      return null;
+    }
+  }
 
   bool _isValidEmail(String email) {
-    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final emailRegExp =
+        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
     return emailRegExp.hasMatch(email);
   }
 
@@ -123,7 +147,8 @@ class _RegistroPState extends State<RegistroP> {
       filled: true,
       fillColor: AppColors.inputRegistro,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius:
+            BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
     );
@@ -135,108 +160,199 @@ class _RegistroPState extends State<RegistroP> {
     correoCtrl.dispose();
     fechaCtrl.dispose();
     telefonoController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.fondoRegistro,
+      backgroundColor:
+          AppColors.fondoRegistro,
 
       appBar: AppBar(
-        backgroundColor: AppColors.fondoRegistro,
+        backgroundColor:
+            AppColors.fondoRegistro,
+
         elevation: 0,
+
         centerTitle: true,
+
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 16),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            size: 16,
+          ),
+
+          onPressed: () =>
+              Navigator.pop(context),
         ),
-        title: const Text("Crear cuenta", style: AppTextStyles.appBar),
+
+        title: const Text(
+          "Crear cuenta",
+          style: AppTextStyles.appBar,
+        ),
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 20,
+        ),
 
-            const Text("Nombre completo", style: AppTextStyles.subtitulo),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+
+          children: [
+            const Text(
+              "Nombre completo",
+              style: AppTextStyles.subtitulo,
+            ),
+
             const SizedBox(height: 8),
+
             TextField(
               controller: nombreCtrl,
-              decoration: _inputDecoration(),
-              onChanged: (_) => setState(() {}),
+
+              decoration:
+                  _inputDecoration(),
+
+              onChanged: (_) =>
+                  setState(() {}),
             ),
 
             const SizedBox(height: 20),
 
-            const Text("Correo electrónico", style: AppTextStyles.subtitulo),
+            const Text(
+              "Correo electrónico",
+              style: AppTextStyles.subtitulo,
+            ),
+
             const SizedBox(height: 8),
+
             TextField(
               controller: correoCtrl,
-              keyboardType: TextInputType.emailAddress,
-              decoration: _inputDecoration().copyWith(
-                errorText: correoValido ? null : "Correo inválido",
+
+              keyboardType:
+                  TextInputType.emailAddress,
+
+              decoration:
+                  _inputDecoration().copyWith(
+                errorText:
+                    correoValido
+                        ? null
+                        : "Correo inválido",
               ),
+
               onChanged: (value) {
                 setState(() {
-                  correoValido = _isValidEmail(value) || value.isEmpty;
+                  correoValido =
+                      _isValidEmail(value) ||
+                          value.isEmpty;
                 });
               },
             ),
 
             const SizedBox(height: 20),
 
-            const Text("Número de teléfono", style: AppTextStyles.subtitulo),
+            const Text(
+              "Número de teléfono",
+              style: AppTextStyles.subtitulo,
+            ),
+
             const SizedBox(height: 8),
+
             IntlPhoneField(
-              controller: telefonoController,
-              decoration: _inputDecoration(),
-              initialCountryCode: codigoPais,
+              controller:
+                  telefonoController,
+
+              decoration:
+                  _inputDecoration(),
+
+              initialCountryCode:
+                  codigoPais,
+
               onChanged: (phone) {
                 setState(() {
-                  telefonoCompleto = phone.completeNumber;
+                  telefonoCompleto =
+                      phone.completeNumber;
                 });
               },
             ),
 
             const SizedBox(height: 20),
 
-            const Text("Fecha de nacimiento", style: AppTextStyles.subtitulo),
+            const Text(
+              "Fecha de nacimiento",
+              style: AppTextStyles.subtitulo,
+            ),
+
             const SizedBox(height: 8),
+
             TextField(
               controller: fechaCtrl,
+
               readOnly: true,
-              decoration: _inputDecoration(),
+
+              decoration:
+                  _inputDecoration(),
+
               onTap: () async {
-                DateTime? fecha = await showDatePicker(
+                DateTime? fecha =
+                    await showDatePicker(
                   context: context,
-                  locale: const Locale('es', 'ES'),
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
+
+                  locale:
+                      const Locale(
+                    'es',
+                    'ES',
+                  ),
+
+                  initialDate:
+                      DateTime.now(),
+
+                  firstDate:
+                      DateTime(1900),
+
+                  lastDate:
+                      DateTime.now(),
                 );
 
                 if (fecha != null) {
-                  final edadCalculada = _calcularEdad(fecha);
+                  final edadCalculada =
+                      _calcularEdad(
+                    fecha,
+                  );
 
                   setState(() {
-                    edad = edadCalculada;
-                    esMayor = edadCalculada >= 18;
+                    edad =
+                        edadCalculada;
+
+                    esMayor =
+                        edadCalculada >=
+                            18;
                   });
 
                   if (!esMayor) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(
                       const SnackBar(
-                        content: Text("Debes ser mayor de 18 años"),
-                        backgroundColor: Colors.red,
+                        content: Text(
+                          "Debes ser mayor de 18 años",
+                        ),
+                        backgroundColor:
+                            Colors.red,
                       ),
                     );
                   }
 
-                  fechaCtrl.text =  "${fecha.day.toString().padLeft(2, '0')}/" 
-                  "${fecha.month.toString().padLeft(2, '0')}/"
-                  "${fecha.year}";
+                  fechaCtrl.text =
+                      "${fecha.day.toString().padLeft(2, '0')}/"
+                      "${fecha.month.toString().padLeft(2, '0')}/"
+                      "${fecha.year}";
                 }
               },
             ),
@@ -244,13 +360,20 @@ class _RegistroPState extends State<RegistroP> {
             // 🔴 MOSTRAR EDAD
             if (fechaCtrl.text.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding:
+                    const EdgeInsets.only(
+                  top: 8,
+                ),
+
                 child: Text(
                   esMayor
                       ? "Edad: $edad años"
                       : "Edad: $edad años (Debe ser mayor de 18)",
+
                   style: TextStyle(
-                    color: esMayor ? Colors.green : Colors.red,
+                    color: esMayor
+                        ? Colors.green
+                        : Colors.red,
                   ),
                 ),
               ),
@@ -260,47 +383,71 @@ class _RegistroPState extends State<RegistroP> {
             Row(
               children: [
                 Checkbox(
-                  value: aceptaTerminos,
-                  activeColor: AppColors.colorBotonPrincipal,
+                  value:
+                      aceptaTerminos,
+
+                  activeColor:
+                      AppColors
+                          .colorBotonPrincipal,
+
                   onChanged: (value) {
                     setState(() {
-                      aceptaTerminos = value ?? false;
+                      aceptaTerminos =
+                          value ?? false;
                     });
                   },
                 ),
+
                 const Expanded(
                   child: Text(
                     "Acepto los Términos y Condiciones y la Política de Privacidad",
-                    style: AppTextStyles.pequeno,
+
+                    style:
+                        AppTextStyles.pequeno,
                   ),
                 ),
               ],
             ),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment:
+                  MainAxisAlignment.center,
+
               children: [
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
+
                       MaterialPageRoute(
-                        builder: (_) => const TerminosCondiciones(),
+                        builder: (_) =>
+                            const TerminosCondiciones(),
                       ),
                     );
                   },
-                  child: const Text("Ver términos"),
+
+                  child:
+                      const Text(
+                    "Ver términos",
+                  ),
                 ),
+
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
+
                       MaterialPageRoute(
-                        builder: (_) => const PoliticaDePrivacidadScreen(),
+                        builder: (_) =>
+                            const PoliticaDePrivacidadScreen(),
                       ),
                     );
                   },
-                  child: const Text("Ver privacidad"),
+
+                  child:
+                      const Text(
+                    "Ver privacidad",
+                  ),
                 ),
               ],
             ),
@@ -311,184 +458,242 @@ class _RegistroPState extends State<RegistroP> {
               child: SizedBox(
                 width: 220,
                 height: 50,
+
                 child: ElevatedButton(
-                  onPressed: (_todosCamposCompletos() && aceptaTerminos)
-    ? () async {
+                  onPressed:
+                      (_todosCamposCompletos() &&
+                              aceptaTerminos)
+                          ? () async {
 
-        // 🔥 VERIFICAR SI EL CORREO YA EXISTE
-        final existe =
-            await AuthService
-                .verificarCorreo(
+                              // 🔥 VERIFICAR SI EL CORREO YA EXISTE
+                              final existe =
+                                  await AuthService
+                                      .verificarCorreo(
+                                email:
+                                    correoCtrl.text,
+                              );
 
-          email:
-              correoCtrl.text,
-        );
+                              // 🔴 YA EXISTE
+                              if (existe['exists'] ==
+                                  true) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Ya existe una cuenta con este correo, inicia sesión",
+                                    ),
 
-        // 🔴 YA EXISTE
-        if (existe['exists']
-            == true) {
+                                    backgroundColor:
+                                        Colors.red,
+                                  ),
+                                );
 
-          ScaffoldMessenger.of(
-                  context)
-              .showSnackBar(
+                                return;
+                              }
 
-            const SnackBar(
+                              // 🟢 CONTINUAR REGISTRO
+                              final prefs =
+                                  await SharedPreferences
+                                      .getInstance();
 
-              content: Text(
-                "Ya existe una cuenta con este correo, inicia sesión",
-              ),
+                              await prefs.setString(
+                                "correo",
+                                correoCtrl.text
+                                    .trim(),
+                              );
 
-              backgroundColor:
-                  Colors.red,
-            ),
-          );
+                              Navigator.push(
+                                context,
 
-          return;
-        }
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      RegistroC(
+                                    nombre:
+                                        nombreCtrl
+                                            .text,
 
-        // 🟢 CONTINUAR REGISTRO
-        final prefs =
-            await SharedPreferences
-                .getInstance();
+                                    correo:
+                                        correoCtrl
+                                            .text,
 
-        await prefs.setString(
-          "correo",
-          correoCtrl.text
-              .trim(),
-        );
+                                    telefono:
+                                        telefonoCompleto,
 
-        Navigator.push(
+                                    fecha:
+                                        fechaCtrl
+                                            .text,
+                                  ),
+                                ),
+                              );
+                            }
+                          : null,
 
-          context,
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor:
+                        AppColors
+                            .colorBotonPrincipal,
 
-          MaterialPageRoute(
-
-            builder: (_) =>
-                RegistroC(
-
-              nombre:
-                  nombreCtrl.text,
-
-              correo:
-                  correoCtrl.text,
-
-              telefono:
-                  telefonoCompleto,
-
-              fecha:
-                  fechaCtrl.text,
-            ),
-          ),
-        );
-      }
-    : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.colorBotonPrincipal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                    shape:
+                        RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(
+                        25,
+                      ),
                     ),
                   ),
-                  child: const Text("Siguiente", style: AppTextStyles.boton),
+
+                  child: const Text(
+                    "Siguiente",
+                    style:
+                        AppTextStyles.boton,
+                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            const Center(child: Text("o regístrate con")),
+            const Center(
+              child:
+                  Text("o regístrate con"),
+            ),
 
             const SizedBox(height: 20),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment:
+                  MainAxisAlignment.center,
+
               children: [
                 Container(
                   width: 45,
                   height: 45,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.inputRegistro,
+
+                  decoration:
+                      const BoxDecoration(
+                    shape:
+                        BoxShape.circle,
+
+                    color:
+                        AppColors
+                            .inputRegistro,
                   ),
+
                   child: IconButton(
                     onPressed: () async {
-                      final userCredential = await signInWithGoogle();
+
+                      final userCredential =
+                          await signInWithGoogle();
 
                       if (userCredential != null &&
-                          userCredential.user != null) {
+                          userCredential.user !=
+                              null) {
 
-                        final prefs =
-                            await SharedPreferences.getInstance();
-                        await prefs.setString(
-                          "correo",
-                          userCredential.user?.email ?? "",
+                        // ==================================================
+                        // DATOS DEL USUARIO GOOGLE
+                        // ==================================================
+
+                        final user =
+                            userCredential.user!;
+
+                        final email =
+                            user.email ?? '';
+
+                        final nombre =
+                            user.displayName ?? '';
+
+                        // ==================================================
+                        // 🔥 VERIFICAR SI EL CORREO YA EXISTE
+                        // ==================================================
+
+                        final existe =
+                            await AuthService
+                                .verificarCorreoGoogle(
+                          email: email,
                         );
 
-                        /*Navigator.pushReplacement(
+                        // ==================================================
+                        // 🔴 ERROR AL VERIFICAR
+                        // ==================================================
+
+                        if (existe['ok'] !=
+                            true) {
+
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                existe['message'] ??
+                                    'No se pudo verificar el correo',
+                              ),
+
+                              backgroundColor:
+                                  Colors.red,
+                            ),
+                          );
+
+                          return;
+                        }
+
+                        // ==================================================
+                        // 🔴 YA EXISTE
+                        // ==================================================
+
+                        if (existe['exists'] ==
+                            true) {
+
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Ya existe una cuenta con este correo, inicia sesión",
+                              ),
+
+                              backgroundColor:
+                                  Colors.red,
+                            ),
+                          );
+
+                          return;
+                        }
+
+                        // ==================================================
+                        // 🟢 NUEVO USUARIO
+                        // ==================================================
+
+                        final prefs =
+                            await SharedPreferences
+                                .getInstance();
+
+                        await prefs.setString(
+                          "correo",
+                          email,
+                        );
+
+                        Navigator.pushReplacement(
                           context,
+
                           MaterialPageRoute(
-                            builder: (_) => CompletarPerfil(
-                              nombre: userCredential.user?.displayName ?? '',
-                              correo: userCredential.user?.email ?? '',
+                            builder: (_) =>
+                                CompletarPerfil(
+                              nombre:
+                                  nombre,
+
+                              correo:
+                                  email,
                             ),
                           ),
-                        );*/
-
-                        final user = userCredential.user!;
-final email = user.email ?? '';
-final nombre = user.displayName ?? '';
-
-// =========================
-// REGISTRAR GOOGLE
-// =========================
-final register =
-    await AuthService.registerGoogle(
-
-  name: nombre,
-  email: email,
-  telefono: telefonoCompleto,
-  fechaNacimiento:
-      fechaCtrl.text,
-);
-
-// 🔴 YA EXISTE
-if (register['exists'] == true) {
-
-  ScaffoldMessenger.of(context)
-      .showSnackBar(
-
-    const SnackBar(
-
-      content: Text(
-        "Ya existe una cuenta con este correo, inicia sesión",
-      ),
-
-      backgroundColor:
-          Colors.red,
-    ),
-  );
-
-  return;
-}
-
-// 🟢 NUEVO USUARIO
-Navigator.pushReplacement(
-
-  context,
-
-  MaterialPageRoute(
-
-    builder: (_) =>
-        CompletarPerfil(
-
-      nombre: nombre,
-      correo: email,
-    ),
-  ),
-);
+                        );
                       }
-
                     },
-                    icon: const Icon(Icons.g_mobiledata),
+
+                    icon: const Icon(
+                      Icons.g_mobiledata,
+                    ),
                   ),
                 ),
               ],

@@ -3,6 +3,7 @@
 require('dotenv').config();
 const express = require('express');
 const authRoutes = require('./routes/auth.routes');
+const vitalsRoutes = require('./routes/vitals.routes');
 const connectDB = require('./config/db');
 const Controllers = require('./controllers/auth.controller');
 //const authJWT = require('./middlewares/authJWT');
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/vitals', vitalsRoutes);
 app.use('/api', reportRoutes);//nuevo
 app.use('/api/password-reset', passwordResetRoutes)//nuevo hoy
 

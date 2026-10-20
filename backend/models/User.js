@@ -36,7 +36,7 @@ resetToken: {
 },
 */
 
-  // 🔥 NUEVO
+  // NUEVO
   tipoHome: { type: String, default: null },
   fechaNacimiento: { type: Date, default: null },// 🔥 NUEVO
 
@@ -53,6 +53,9 @@ resetToken: {
     contactoEmergenciaTelefono: String,
     //fechaNacimiento: Date
   }
+
+  }, {
+  timestamps: true  
 });
 
 module.exports = mongoose.model('User', userSchema);

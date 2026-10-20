@@ -189,6 +189,40 @@ const registerGoogle = async (req, res) => {
   }
 };
 
+// ================= VERIFICAR CORREO GOOGLE =================
+
+const verificarCorreoGoogle = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        ok: false,
+        message: 'El correo es obligatorio',
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    const existe = await User.findOne({
+      email: cleanEmail,
+    });
+
+    return res.json({
+      ok: true,
+      exists: !!existe,
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      ok: false,
+      message: 'Error al verificar el correo',
+    });
+  }
+};
+
 // ================= GOOGLE LOGIN =================
 const loginGoogle = async (req, res) => {
 
@@ -867,4 +901,5 @@ module.exports = {
   //forgotPassword,
   //verifyResetCode,
   //resetPassword
+  verificarCorreoGoogle,
 };

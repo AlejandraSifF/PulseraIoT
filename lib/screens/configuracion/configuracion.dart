@@ -10,6 +10,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../auth/login/login.dart';
 import '../../provider/perfil_provider.dart';
+import '../historial/historial_vitales.dart';
 
 class ConfiguracionPantalla extends StatelessWidget {
   const ConfiguracionPantalla({super.key});
@@ -39,6 +40,13 @@ class ConfiguracionPantalla extends StatelessWidget {
             icono: Icons.person,
             texto: "Editar Perfil",
             pantalla: const EditarPerfilSubpantalla(),
+          ),
+
+          _itemConfiguracion(
+            context,
+            icono: Icons.monitor_heart,
+            texto: "Historial de signos vitales",
+            pantalla: const HistorialVitales(),
           ),
 
           _itemConfiguracion(

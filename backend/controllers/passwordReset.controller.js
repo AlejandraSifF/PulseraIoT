@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 
 const User = require('../models/User');
 //const PasswordReset = require('../models/passwordReset');
-const PasswordReset = require('../models/passwordReset');
+const PasswordReset = require('../models/PasswordReset');
 
 
 // ================= TRANSPORTER =================
